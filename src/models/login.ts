@@ -3,7 +3,7 @@ import { routerRedux } from 'dva/router';
 import { Effect } from 'dva';
 import { stringify } from 'querystring';
 
-import { fakeAccountLogin, getFakeCaptcha } from '@/services/login';
+import { accountLogin, getFakeCaptcha } from '@/services/login';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 
@@ -39,10 +39,14 @@ const Model: LoginModelType = {
 
   effects: {
     *login({ payload }, { call, put }) {
-      const response = yield call(fakeAccountLogin, payload);
+      const { autoLogin } = payload;
+      const response = yield call(accountLogin, payload);
       yield put({
         type: 'changeLoginStatus',
-        payload: response,
+        payload: {
+          ...response,
+          autoLogin,
+        },
       });
       // Login successfully
       if (response.status === 'ok') {
@@ -60,6 +64,9 @@ const Model: LoginModelType = {
             window.location.href = '/';
             return;
           }
+        } else {
+          window.location.href = '/';
+          return;
         }
         yield put(routerRedux.replace(redirect || '/'));
       }
@@ -86,13 +93,18 @@ const Model: LoginModelType = {
 
   reducers: {
     changeLoginStatus(state, { payload }) {
+      const token = payload.token || '';
+
+      if (payload.autoLogin) {
+        localStorage.setItem('token', token);
+      }
       setAuthority(payload.currentAuthority);
       return {
         ...state,
         currentAuthority: payload.currentAuthority,
         status: payload.status,
         type: payload.type,
-        token: payload.token || '',
+        token,
       };
     },
   },

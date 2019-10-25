@@ -9,7 +9,7 @@ export default {
   'GET /api/currentUser': {
     name: 'Serati Ma',
     avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-    userid: '00000001',
+    id: 1,
     email: 'antdesign@alipay.com',
     signature: '海纳百川，有容乃大',
     title: '交互专家',
@@ -84,6 +84,7 @@ export default {
         status: 'ok',
         type,
         currentAuthority: 'admin',
+        token: 'this_is_a_server_side_token',
       });
       return;
     }
