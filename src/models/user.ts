@@ -3,18 +3,49 @@ import { Reducer } from 'redux';
 
 import { queryCurrent, query as queryUsers } from '@/services/user';
 
+export interface TagType {
+  key: string;
+  label: string;
+}
+
+export interface GeographicType {
+  province: {
+    label: string;
+    key: string;
+  };
+  city: {
+    label: string;
+    key: string;
+  };
+}
+
+export interface NoticeType {
+  id: string;
+  title: string;
+  logo: string;
+  description: string;
+  updatedAt: string;
+  member: string;
+  href: string;
+  memberLink: string;
+}
+
 export interface CurrentUser {
-  id?: number;
-  avatar?: string;
   name?: string;
+  avatar?: string;
+  id?: number;
+  notice?: NoticeType[];
+  email?: string;
+  signature?: string;
   title?: string;
   group?: string;
-  signature?: string;
-  tags?: {
-    key: string;
-    label: string;
-  }[];
+  tags?: TagType[];
+  notifyCount?: number;
   unreadCount?: number;
+  country?: string;
+  geographic?: GeographicType;
+  address?: string;
+  phone?: string;
 }
 
 export interface UserModelState {
