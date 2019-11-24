@@ -1,196 +1,107 @@
-import { Button, Card, Divider, Form, message, Table } from 'antd';
-import React, { Component, Fragment } from 'react';
-
-import { Dispatch, Action } from 'redux';
-import { FormComponentProps } from 'antd/es/form';
+import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { Card, Button, Table } from 'antd';
+import { FormComponentProps } from 'antd/es/form';
+import { Dispatch, Action } from 'redux';
+import { CategoryModelState } from './model';
 import { connect } from 'dva';
 import CreateForm from './components/CreateForm';
-import { StandardTableColumnProps } from './components/StandardTable';
-import UpdateForm, { FormValueType } from './components/UpdateForm';
 
-import styles from './style.less';
-import { CategoryModelState, Category } from '@/models/category';
+export interface CategoryState {
+  createModelVisible: boolean;
+  updateModelVisible: boolean;
+}
 
-interface TableListProps extends FormComponentProps {
+export interface CategoryProps extends FormComponentProps {
   dispatch: Dispatch<
-    Action<'category/add' | 'category/fetch' | 'category/remove' | 'category/update'>
+    Action<'categories/add' | 'categories/fetch' | 'categories/remove' | 'categories/update'>
   >;
   loading: boolean;
-  category: CategoryModelState;
+  categories: CategoryModelState;
 }
 
-interface TableListState {
-  modalVisible: boolean;
-  updateModalVisible: boolean;
-  formValues: { [key: string]: string };
-  stepFormValues: Partial<Category>;
+export interface CategoryColumnProps {
+  title: string;
+  dataIndex: string;
 }
-
-/* eslint react/no-multi-comp:0 */
 @connect(
   ({
-    category,
+    categories,
     loading,
   }: {
-    category: CategoryModelState;
+    categories: CategoryModelState;
     loading: {
       models: {
         [key: string]: boolean;
       };
     };
   }) => ({
-    category,
-    loading: loading.models.category,
+    categories,
+    loading: loading.models.categories,
   }),
 )
-class TableList extends Component<TableListProps, TableListState> {
-  state: TableListState = {
-    modalVisible: false,
-    updateModalVisible: false,
-    formValues: {},
-    stepFormValues: {},
+class Category extends React.Component<CategoryProps, CategoryState> {
+  state: CategoryState = {
+    createModelVisible: false,
+    updateModelVisible: false,
   };
-
-  columns: StandardTableColumnProps[] = [
-    {
-      title: '类型名称',
-      dataIndex: 'title',
-    },
-    {
-      title: '居住类型',
-      dataIndex: 'type',
-      render(val: 'person' | 'company') {
-        return val === 'person' ? '人员入住' : '公司或机构入住';
-      },
-    },
-    {
-      title: '水电费收费',
-      dataIndex: 'utilityRule',
-    },
-    {
-      title: '备注',
-      dataIndex: 'remark',
-    },
-    {
-      title: '操作',
-      render: (text, record) => (
-        <Fragment>
-          <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a>
-          <Divider type="vertical" />
-          <a href="">订阅警报</a>
-        </Fragment>
-      ),
-    },
-  ];
-
-  componentDidMount() {
+  componentDidMount = () => {
     const { dispatch } = this.props;
-    dispatch({
-      type: 'category/fetch',
-    });
-  }
-
-  handleModalVisible = (flag?: boolean) => {
+    dispatch({ type: 'categories/fetch', payload: { aaa: 'aaa' } });
+  };
+  handleCreateModalVisible = (flag: boolean) => {
     this.setState({
-      modalVisible: !!flag,
+      createModelVisible: flag,
     });
   };
-
-  handleUpdateModalVisible = (flag?: boolean, record?: Category) => {
-    this.setState({
-      updateModalVisible: !!flag,
-      stepFormValues: record || {},
-    });
+  handleAdd = (values: {}) => {
+    console.log(values);
   };
-
-  handleAdd = (fields: { desc: any }) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'category/add',
-      payload: {
-        desc: fields.desc,
-      },
-    });
-
-    message.success('添加成功');
-    this.handleModalVisible();
-  };
-
-  handleUpdate = (fields: FormValueType) => {
-    // const { dispatch } = this.props;
-    // dispatch({
-    //   type: 'category/update',
-    //   payload: {
-    //     name: fields.name,
-    //     desc: fields.desc,
-    //     key: fields.key,
-    //   },
-    // });
-
-    message.success('配置成功');
-    this.handleUpdateModalVisible();
-  };
-
   render() {
     const {
-      category: { data },
+      categories: { data },
       loading,
     } = this.props;
-
     const { list, pagination } = data;
 
-    const paginationProps = pagination
-      ? {
-          showSizeChanger: false,
-          showQuickJumper: false,
-          ...pagination,
-        }
-      : false;
-
-    const { modalVisible, updateModalVisible, stepFormValues } = this.state;
-
-    const parentMethods = {
-      handleAdd: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-    };
-    const updateMethods = {
-      handleUpdateModalVisible: this.handleUpdateModalVisible,
-      handleUpdate: this.handleUpdate,
-    };
-
+    const columns: CategoryColumnProps[] = [
+      {
+        title: '名称',
+        dataIndex: 'title',
+      },
+      {
+        title: '水电费类型',
+        dataIndex: 'utilityType',
+      },
+      {
+        title: '说明',
+        dataIndex: 'description',
+      },
+    ];
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
-          <div className={styles.tableList}>
-            <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                添加
+          <div>
+            <div style={{ marginBottom: 16 }}>
+              <Button
+                icon="plus"
+                type="primary"
+                onClick={() => this.handleCreateModalVisible(true)}
+              >
+                新建
               </Button>
             </div>
-            <div className={styles.standardTable}>
-              <Table
-                rowKey={'id'}
-                dataSource={list}
-                pagination={paginationProps}
-                loading={loading}
-                columns={this.columns}
-              />
-            </div>
+            <Table columns={columns} dataSource={list} loading={loading} />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
-        {stepFormValues && Object.keys(stepFormValues).length ? (
-          //@ts-ignore
-          <UpdateForm
-            {...updateMethods}
-            updateModalVisible={updateModalVisible}
-            values={stepFormValues}
-          />
-        ) : null}
+        <CreateForm
+          handleAdd={this.handleAdd}
+          handleModelVisible={this.handleCreateModalVisible}
+          modelVisible={this.state.createModelVisible}
+        />
       </PageHeaderWrapper>
     );
   }
 }
 
-export default Form.create<TableListProps>()(TableList);
+export default Category;

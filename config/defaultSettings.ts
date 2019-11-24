@@ -43,18 +43,20 @@ export interface DefaultSettings {
 }
 
 export default {
+  title: '公寓管理',
+  pwa: false,
+  iconfontUrl: '',
   navTheme: 'dark',
   primaryColor: '#1890FF',
   layout: 'sidemenu',
   contentWidth: 'Fluid',
-  fixedHeader: false,
+  fixedHeader: true,
   autoHideHeader: false,
-  fixSiderbar: false,
+  fixSiderbar: true,
   colorWeak: false,
   menu: {
     locale: true,
   },
-  title: '公寓管理',
-  pwa: false,
-  iconfontUrl: '',
+  collapse: true,
+  language: 'zh-CN',
 } as DefaultSettings;

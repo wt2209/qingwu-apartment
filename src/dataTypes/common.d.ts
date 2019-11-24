@@ -1,7 +1,10 @@
-export interface DefaultPagination {
-  total: number;
-  pageSize: number;
-  current: number;
+import { AnyAction } from 'redux';
+import { EffectsCommandMap } from 'dva';
+
+// model 中使用的 listdata
+export interface ListData<T> {
+  list: T[];
+  pagination: Partial<Pagination>;
 }
 
 // 缴费规则
@@ -27,4 +30,10 @@ export interface ResponseItemType {
   status: 'ok' | 'error';
   errMsg?: string;
   data?: Object;
+}
+
+export interface Pagination {
+  current: number;
+  pageSize: number;
+  total: number;
 }
