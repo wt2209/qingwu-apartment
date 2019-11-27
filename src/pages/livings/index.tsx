@@ -1,9 +1,11 @@
 import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Row, Col, Button, Icon } from 'antd';
+import { Card, Row, Col, Button, Icon, Divider } from 'antd';
 import Person from './components/Person';
 import Company from './components/Company';
 import { LivingListItem, RoomListItem } from '@/dataTypes/listItem';
+import SelectBuilding from './components/SelectBuilding';
+import SearchBar from './components/SearchBar';
 
 const livings: LivingListItem[] = [
   {
@@ -287,6 +289,11 @@ class Living extends React.Component {
   render() {
     return (
       <PageHeaderWrapper title={false}>
+        <Card style={{ marginBottom: 20 }}>
+          <SelectBuilding />
+          <Divider dashed style={{ margin: '6px 0' }} />
+          <SearchBar />
+        </Card>
         <Row gutter={24}>
           {livings.map(living => (
             <Col span={12}>
