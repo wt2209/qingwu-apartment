@@ -1,5 +1,5 @@
 import { ResponseListType } from '@/dataTypes/common';
-import { CategoryListItem, RoomListItem } from '@/dataTypes/listItem';
+import { RoomListItem } from '@/dataTypes/listItem';
 import { Request, Response } from 'express';
 
 let rooms: ResponseListType<RoomListItem> = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Button, Divider, Tag } from 'antd';
+import { Card, Divider, Tag } from 'antd';
 import { RecordListItem } from '@/dataTypes/listItem';
 
 export interface CompanyState {}

@@ -3,7 +3,7 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Card, Row, Col, Button, Icon, Divider } from 'antd';
 import Person from './components/Person';
 import Company from './components/Company';
-import { LivingListItem, RoomListItem, RecordListItem } from '@/dataTypes/listItem';
+import { LivingListItem, RecordListItem } from '@/dataTypes/listItem';
 import SelectTags from './components/SelectTags';
 import SearchBar from './components/SearchBar';
 
@@ -250,7 +250,7 @@ class Living extends React.Component {
     );
   };
 
-  renderLivingTitle = (living: RoomListItem) => {
+  renderLivingTitle = (living: { roomName: string; remark: string }) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ fontSize: 18, fontWeight: 'bold', flex: 2 }}>{living.roomName}</div>
