@@ -28,14 +28,14 @@ const buildings = [
 ];
 const units = ['1单元', '2单元', '3单元', '4单元'];
 
-export interface SelectBuildingState {
+export interface SelectTagsState {
   selectedCategory: string;
   selectedBuilding: string;
   selectedUnit: string;
 }
 
-class SelectBuilding extends React.Component {
-  state: SelectBuildingState = {
+class SelectTags extends React.Component {
+  state: SelectTagsState = {
     selectedCategory: '',
     selectedBuilding: '',
     selectedUnit: '',
@@ -58,7 +58,7 @@ class SelectBuilding extends React.Component {
     this.setState(result);
     this.fetchData(result);
   };
-  fetchData = (options: SelectBuildingState) => {
+  fetchData = (options: SelectTagsState) => {
     if (options.selectedBuilding !== '' && options.selectedUnit !== '') {
       console.log(options);
     }
@@ -113,4 +113,4 @@ class SelectBuilding extends React.Component {
   }
 }
 
-export default SelectBuilding;
+export default SelectTags;

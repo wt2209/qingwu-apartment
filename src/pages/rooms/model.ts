@@ -1,12 +1,12 @@
 import { Reducer } from 'redux';
 import { Effect } from 'dva';
 import { ListData } from '@/dataTypes/common';
-import { CategoryListItem } from '@/dataTypes/listItem';
-import { query } from '@/services/category';
+import { RoomListItem } from '@/dataTypes/listItem';
+import { query } from '@/services/room';
 
-export interface CategoryModelType {
-  namespace: 'categories';
-  state: CategoryModelState;
+export interface ModelType {
+  namespace: 'rooms';
+  state: ModelState;
   effects: {
     fetch: Effect;
     add: Effect;
@@ -14,16 +14,16 @@ export interface CategoryModelType {
     remove: Effect;
   };
   reducers: {
-    save: Reducer<CategoryModelState>;
+    save: Reducer<ModelState>;
   };
 }
 
-export interface CategoryModelState {
-  data: ListData<CategoryListItem>;
+export interface ModelState {
+  data: ListData<RoomListItem>;
 }
 
-const CategoryModel: CategoryModelType = {
-  namespace: 'categories',
+const Model: ModelType = {
+  namespace: 'rooms',
   state: {
     data: {
       list: [],
@@ -48,4 +48,4 @@ const CategoryModel: CategoryModelType = {
     },
   },
 };
-export default CategoryModel;
+export default Model;

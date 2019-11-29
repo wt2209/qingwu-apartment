@@ -3,41 +3,39 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Card, Button, Table } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
-import { CategoryModelState } from './model';
+import { ModelState } from './model';
 import { connect } from 'dva';
 import CreateForm from './components/CreateForm';
 
-export interface CategoryState {
+export interface State {
   createModelVisible: boolean;
   updateModelVisible: boolean;
 }
 
-export interface CategoryProps extends FormComponentProps {
-  dispatch: Dispatch<
-    Action<'categories/add' | 'categories/fetch' | 'categories/remove' | 'categories/update'>
-  >;
+export interface Props extends FormComponentProps {
+  dispatch: Dispatch<Action<'rooms/add' | 'rooms/fetch' | 'rooms/remove' | 'rooms/update'>>;
   loading: boolean;
-  categories: CategoryModelState;
+  rooms: ModelState;
 }
 
 @connect(
   ({
-    categories,
+    rooms,
     loading,
   }: {
-    categories: CategoryModelState;
+    rooms: ModelState;
     loading: {
       models: {
         [key: string]: boolean;
       };
     };
   }) => ({
-    categories,
-    loading: loading.models.categories,
+    rooms,
+    loading: loading.models.rooms,
   }),
 )
-class Category extends React.Component<CategoryProps, CategoryState> {
-  state: CategoryState = {
+class Room extends React.Component<Props, State> {
+  state: State = {
     createModelVisible: false,
     updateModelVisible: false,
   };
@@ -59,31 +57,39 @@ class Category extends React.Component<CategoryProps, CategoryState> {
   };
   fetchData = (payload: { current: number; pageSize: number }) => {
     const { dispatch } = this.props;
-    dispatch({ type: 'categories/fetch', payload });
+    dispatch({ type: 'rooms/fetch', payload });
   };
   render() {
     const {
-      categories: { data },
+      rooms: { data },
       loading,
     } = this.props;
     const { list, pagination } = data;
 
     const columns = [
       {
-        title: '名称',
-        dataIndex: 'title',
+        title: '房间号',
+        dataIndex: 'roomName',
       },
       {
-        title: '属于',
-        dataIndex: 'type',
-        render: (text: string) => (text === 'person' ? '个人居住' : '公司或机构入住'),
+        title: '楼号',
+        dataIndex: 'building',
       },
       {
-        title: '水电费收费',
-        dataIndex: 'utilityType',
+        title: '单元/楼层',
+        dataIndex: 'unit',
       },
       {
-        title: '说明',
+        title: '定员人数',
+        dataIndex: 'number',
+      },
+      {
+        title: '默认租金',
+        dataIndex: 'rent',
+        render: (rent: number) => (rent ? rent : null),
+      },
+      {
+        title: '备注',
         dataIndex: 'remark',
       },
     ];
@@ -102,7 +108,6 @@ class Category extends React.Component<CategoryProps, CategoryState> {
             </div>
             <Table
               pagination={{ ...pagination, onChange: this.handlePaginationChange }}
-              rowKey="id"
               columns={columns}
               dataSource={list}
               loading={loading}
@@ -119,4 +124,4 @@ class Category extends React.Component<CategoryProps, CategoryState> {
   }
 }
 
-export default Category;
+export default Room;

@@ -3,21 +3,17 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Card, Row, Col, Button, Icon, Divider } from 'antd';
 import Person from './components/Person';
 import Company from './components/Company';
-import { LivingListItem, RoomListItem } from '@/dataTypes/listItem';
-import SelectBuilding from './components/SelectBuilding';
+import { LivingListItem, RoomListItem, RecordListItem } from '@/dataTypes/listItem';
+import SelectTags from './components/SelectTags';
 import SearchBar from './components/SearchBar';
 
 const livings: LivingListItem[] = [
   {
     id: 1,
-    category: {
-      type: 'company',
-      title: '包商公司',
-    },
     roomName: '1-1-102',
     building: '1#',
     unit: '1单元',
-    number: 4,
+    number: 0,
     remark: '房间的说明',
     records: [
       {
@@ -48,10 +44,6 @@ const livings: LivingListItem[] = [
   },
   {
     id: 2,
-    category: {
-      type: 'person',
-      title: '新职工',
-    },
     roomName: '3-3-101',
     building: '3#',
     unit: '3单元',
@@ -93,7 +85,7 @@ const livings: LivingListItem[] = [
         type: 'person',
         category: {
           type: 'person',
-          title: '新职工',
+          title: '单身职工',
         },
         room: {
           roomName: '3-3-101',
@@ -122,14 +114,10 @@ const livings: LivingListItem[] = [
   },
   {
     id: 3,
-    category: {
-      type: 'company',
-      title: '包商公司',
-    },
     roomName: '2-2-101',
     building: '2#',
     unit: '2单元',
-    number: 4,
+    number: 1,
     remark: '房间的说明',
     records: [
       {
@@ -160,10 +148,6 @@ const livings: LivingListItem[] = [
   },
   {
     id: 4,
-    category: {
-      type: 'person',
-      title: '租赁',
-    },
     roomName: '3-3-101',
     building: '3#',
     unit: '3单元',
@@ -206,60 +190,22 @@ const livings: LivingListItem[] = [
 
 class Living extends React.Component {
   renderContent = (living: LivingListItem) => {
-    switch (living.category.type) {
-      case 'person':
-        return this.renderPeople(living);
-      case 'company':
-        return this.renderCompany(living);
-      default:
-        return null;
-    }
-  };
-  renderCompany = (living: LivingListItem) => {
-    if (Object.keys(living.records).length > 0) {
-      const record = living.records[0];
-      return (
-        <Card.Grid
-          style={{
-            padding: 0,
-            margin: '0.5%',
-            width: '99%',
-          }}
-        >
-          <Company record={record} />
-        </Card.Grid>
-      );
-    } else {
-      return (
-        <Card.Grid style={{ padding: 0, margin: '0.5%', width: '99%' }}>
-          <Button
-            type="dashed"
-            style={{ border: '0', backgroundColor: '#5dade2', width: '100%', height: 225 }}
-          >
-            <Icon type="plus" style={{ fontSize: 30, color: 'rgba(0,0,0,0.65)' }} />
-          </Button>
-        </Card.Grid>
-      );
-    }
-  };
-  renderPeople = (living: LivingListItem) => {
     const number = Math.max(living.number, living.records.length);
-    const result = [];
     const width = number === 1 ? '99%' : '49%';
+    let result = [];
     for (let i = 0; i < number; i++) {
       const record = living.records[i];
       if (record) {
-        result.push(
-          <Card.Grid
-            style={{
-              padding: 0,
-              margin: '0.5%',
-              width,
-            }}
-          >
-            <Person record={record} />
-          </Card.Grid>,
-        );
+        switch (record.type) {
+          case 'person':
+            result.push(this.renderPeople(record, width));
+            break;
+          case 'company':
+            result.push(this.renderCompany(record, width));
+            break;
+          default:
+            result.push(null);
+        }
       } else {
         result.push(
           <Card.Grid style={{ padding: 0, margin: '0.5%', width }}>
@@ -275,22 +221,49 @@ class Living extends React.Component {
     }
     return result;
   };
+
+  renderCompany = (record: RecordListItem, width: string) => {
+    return (
+      <Card.Grid
+        style={{
+          padding: 0,
+          margin: '0.5%',
+          width,
+        }}
+      >
+        <Company record={record} />
+      </Card.Grid>
+    );
+  };
+
+  renderPeople = (record: RecordListItem, width: string) => {
+    return (
+      <Card.Grid
+        style={{
+          padding: 0,
+          margin: '0.5%',
+          width,
+        }}
+      >
+        <Person record={record} />
+      </Card.Grid>
+    );
+  };
+
   renderLivingTitle = (living: RoomListItem) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div style={{ fontSize: 18, fontWeight: 'bold', flex: 2 }}>
-          {living.roomName}
-          <span style={{ fontSize: 14 }}>（{living.category.title}）</span>
-        </div>
+        <div style={{ fontSize: 18, fontWeight: 'bold', flex: 2 }}>{living.roomName}</div>
         <div style={{ fontSize: 14, flex: 4 }}>{living.remark}</div>
       </div>
     );
   };
+
   render() {
     return (
       <PageHeaderWrapper title={false}>
         <Card style={{ marginBottom: 20 }}>
-          <SelectBuilding />
+          <SelectTags />
           <Divider dashed style={{ margin: '6px 0' }} />
           <SearchBar />
         </Card>

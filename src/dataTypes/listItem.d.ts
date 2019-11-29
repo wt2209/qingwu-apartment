@@ -9,6 +9,7 @@ export interface PersonListItem {
   identify: string;
   phone: string;
   department: string;
+  hiredAt: string; // 入职时间
   enteredAt: string; // 此人入住公寓的时间
   contractStart: string;
   contractEnd: string;
@@ -26,10 +27,10 @@ export interface CategoryListItem {
 
 export interface RoomListItem {
   id: number;
-  category: Partial<CategoryListItem>;
   roomName: string;
   building: string;
   unit: string;
+  rent: number; // 房间的默认租金，如承包商公寓的房间租金。入住时，可使用此租金，也可自定义新租金
   number: number; // 最大人数
   remark: string; // 房间备注
 }
@@ -62,7 +63,6 @@ export interface RecordListItem {
 // 已房间为主题，计算出来的 “居住情况”
 export interface LivingListItem {
   id: number;
-  category: Partial<CategoryListItem>;
   roomName: string;
   building: string;
   unit: string;

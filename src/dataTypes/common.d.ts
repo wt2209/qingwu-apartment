@@ -11,18 +11,15 @@ export interface ListData<T> {
 export interface ChargeRule {
   name: string;
   fee: Array<number>;
-  discountType: 'money' | 'percent';
-  discount: Array<number>;
+  discountType?: 'money' | 'percent';
+  discount?: Array<number>;
 }
 
 // 后端返回的数组结果
-export interface ResponseListType {
+export interface ResponseListType<T> {
   status: 'ok' | 'error';
   errMsg?: string;
-  data?: {
-    list: Array<any>;
-    pagination: Object;
-  };
+  data: ListData<T>;
 }
 
 // 后端返回的单个结果

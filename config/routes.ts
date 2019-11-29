@@ -62,17 +62,24 @@ export default [
             component: './list/table-list',
           },
           {
-            name: '居住',
-            icon: 'smile',
-            path: '/livings',
-            component: './livings',
-          },
-          {
             name: '房间类型',
             icon: 'smile',
             path: '/categories',
             component: './categories',
           },
+          {
+            name: '房间',
+            icon: 'smile',
+            path: '/rooms',
+            component: './rooms',
+          },
+          {
+            name: '居住',
+            icon: 'smile',
+            path: '/livings',
+            component: './livings',
+          },
+
           {
             component: './404',
           },

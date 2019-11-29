@@ -16,9 +16,12 @@ class Person extends React.Component<PersonProps, PersonState> {
         bordered={false}
       >
         <div style={{ display: 'flex', alignItems: 'center', paddingBottom: 4 }}>
-          <div style={{ flex: 1, fontSize: 16, fontWeight: 'bold' }}>
+          <div style={{ flex: 2, fontSize: 16, fontWeight: 'bold' }}>
             {person.name}（{person.gender}
             {person.education ? '，' + person.education : null}）
+          </div>
+          <div style={{ flex: 1, fontSize: 14, fontWeight: 'bold', textAlign: 'right' }}>
+            {record.category.title}
           </div>
         </div>
         <Divider style={{ margin: 2, backgroundColor: '#7ec4e6' }} />
