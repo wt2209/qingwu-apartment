@@ -1,6 +1,10 @@
 import request from '@/utils/request';
 
-export async function query(params = {}): Promise<any> {
+export interface CategoryFetchParams {
+  current: number;
+  pageSize: number;
+}
+export async function query(params: CategoryFetchParams): Promise<any> {
   return request('/api/categories', {
     params,
   });

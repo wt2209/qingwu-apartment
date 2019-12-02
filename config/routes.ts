@@ -61,23 +61,43 @@ export default [
             path: '/list/table-list',
             component: './list/table-list',
           },
+
           {
-            name: '房间类型',
-            icon: 'smile',
-            path: '/categories',
-            component: './categories',
-          },
-          {
-            name: '房间',
-            icon: 'smile',
-            path: '/rooms',
-            component: './rooms',
-          },
-          {
-            name: '居住',
-            icon: 'smile',
-            path: '/livings',
-            component: './livings',
+            name: '居住管理',
+            icon: 'home',
+            path: '/living',
+            routes: [
+              {
+                name: '居住',
+                icon: 'info-circle',
+                path: '/living/index',
+                component: './livings',
+              },
+              {
+                name: '类型',
+                icon: 'info-circle',
+                path: '/living/categories',
+                component: './categories',
+              },
+              {
+                name: '房间',
+                icon: 'info-circle',
+                path: '/living/rooms',
+                component: './rooms',
+              },
+              {
+                name: '人员',
+                icon: 'info-circle',
+                path: '/living/people',
+                component: './people',
+              },
+              {
+                name: '公司',
+                icon: 'info-circle',
+                path: '/living/companies',
+                component: './companies',
+              },
+            ],
           },
 
           {

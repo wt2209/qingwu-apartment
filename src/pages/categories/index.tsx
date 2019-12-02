@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Button, Table } from 'antd';
+import { Card, Button, Table, Divider } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
 import { CategoryModelState } from './model';
 import { connect } from 'dva';
 import CreateForm from './components/CreateForm';
+import styles from '../../styles/index.less';
+import { removeEmpty } from '@/utils/tools';
+import { CategoryFetchParams } from '@/services/category';
 
 export interface CategoryState {
+  params: CategoryFetchParams;
   createModelVisible: boolean;
   updateModelVisible: boolean;
 }
@@ -38,12 +42,12 @@ export interface CategoryProps extends FormComponentProps {
 )
 class Category extends React.Component<CategoryProps, CategoryState> {
   state: CategoryState = {
+    params: { current: 1, pageSize: 20 },
     createModelVisible: false,
     updateModelVisible: false,
   };
   componentDidMount = () => {
-    const payload = { current: 1, pageSize: 20 };
-    this.fetchData(payload);
+    this.fetchData(this.state.params);
   };
   handleCreateModalVisible = (flag: boolean) => {
     this.setState({
@@ -57,10 +61,11 @@ class Category extends React.Component<CategoryProps, CategoryState> {
     const payload = { current, pageSize };
     this.fetchData(payload);
   };
-  fetchData = (payload: { current: number; pageSize: number }) => {
-    const { dispatch } = this.props;
-    dispatch({ type: 'categories/fetch', payload });
+  fetchData = (params: CategoryFetchParams) => {
+    const payload = removeEmpty(params);
+    this.props.dispatch({ type: 'categories/fetch', payload });
   };
+
   render() {
     const {
       categories: { data },
@@ -86,12 +91,22 @@ class Category extends React.Component<CategoryProps, CategoryState> {
         title: '说明',
         dataIndex: 'remark',
       },
+      {
+        title: '操作',
+        render: (text, record) => (
+          <Fragment>
+            <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
+            <Divider type="vertical" />
+            <a href="">删除</a>
+          </Fragment>
+        ),
+      },
     ];
     return (
       <PageHeaderWrapper title={false}>
         <Card bordered={false}>
-          <div>
-            <div style={{ marginBottom: 16 }}>
+          <div className={styles.tableList}>
+            <div className={styles.tableListOperator}>
               <Button
                 icon="plus"
                 type="primary"
@@ -99,10 +114,13 @@ class Category extends React.Component<CategoryProps, CategoryState> {
               >
                 新建
               </Button>
+              <Button icon="download" onClick={() => this.handleCreateModalVisible(true)}>
+                导出
+              </Button>
             </div>
             <Table
-              pagination={{ ...pagination, onChange: this.handlePaginationChange }}
               rowKey="id"
+              pagination={{ ...pagination, onChange: this.handlePaginationChange }}
               columns={columns}
               dataSource={list}
               loading={loading}

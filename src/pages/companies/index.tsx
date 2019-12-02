@@ -1,59 +1,53 @@
 import React, { Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Button, Table, Divider, Form, Row, Col, Input, Select, Icon } from 'antd';
+import { Card, Table, Button, Form, Row, Col, Input, Divider } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
 import { ModelState } from './model';
 import { connect } from 'dva';
-import CreateForm from './components/CreateForm';
 import styles from '../../styles/index.less';
-import { RoomListItem } from '@/dataTypes/listItem';
-import { RoomFetchParams } from '@/services/room';
 import { removeEmpty } from '@/utils/tools';
+import { CompanyFetchParams } from '@/services/company';
 
 const FormItem = Form.Item;
 
 export interface State {
-  createModelVisible: boolean;
-  updateModelVisible: boolean;
-  params: RoomFetchParams;
+  params: CompanyFetchParams;
 }
 
 export interface Props extends FormComponentProps {
-  dispatch: Dispatch<Action<'rooms/add' | 'rooms/fetch' | 'rooms/remove' | 'rooms/update'>>;
+  dispatch: Dispatch<
+    Action<'companies/add' | 'companies/fetch' | 'companies/remove' | 'companies/update'>
+  >;
   loading: boolean;
-  rooms: ModelState;
+  companies: ModelState;
 }
 
 @connect(
   ({
-    rooms,
+    companies,
     loading,
   }: {
-    rooms: ModelState;
+    companies: ModelState;
     loading: {
       models: {
         [key: string]: boolean;
       };
     };
   }) => ({
-    rooms,
-    loading: loading.models.rooms,
+    companies,
+    loading: loading.models.companies,
   }),
 )
-class Room extends React.Component<Props, State> {
+class Company extends React.Component<Props, State> {
   state: State = {
-    params: { current: 1, pageSize: 20 },
-    createModelVisible: false,
-    updateModelVisible: false,
+    params: {
+      current: 1,
+      pageSize: 20,
+    },
   };
   componentDidMount = () => {
     this.fetchData(this.state.params);
-  };
-  handleCreateModalVisible = (flag: boolean) => {
-    this.setState({
-      createModelVisible: flag,
-    });
   };
   handleAdd = (values: {}) => {
     console.log(values);
@@ -85,9 +79,9 @@ class Room extends React.Component<Props, State> {
     this.setState({ params });
     this.fetchData(params);
   };
-  fetchData = (params: RoomFetchParams) => {
+  fetchData = (params: CompanyFetchParams) => {
     const payload = removeEmpty(params);
-    this.props.dispatch({ type: 'rooms/fetch', payload });
+    this.props.dispatch({ type: 'companies/fetch', payload });
   };
 
   renderForm = () => {
@@ -97,16 +91,21 @@ class Room extends React.Component<Props, State> {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
-            <FormItem label="房间号">
-              {getFieldDecorator('roomName')(<Input placeholder="请输入" />)}
+            <FormItem label="公司名">
+              {getFieldDecorator('companyName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={24}>
-            <FormItem label="楼号">
-              {getFieldDecorator('building')(<Input placeholder="请输入" />)}
+          <Col md={4} sm={24}>
+            <FormItem label="负责人">
+              {getFieldDecorator('manager')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={24}>
+          <Col md={4} sm={24}>
+            <FormItem label="联系人">
+              {getFieldDecorator('linkman')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={4} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -122,32 +121,35 @@ class Room extends React.Component<Props, State> {
   };
   render() {
     const {
-      rooms: { data },
+      companies: { data },
       loading,
     } = this.props;
     const { list, pagination } = data;
 
     const columns = [
       {
-        title: '房间号',
-        dataIndex: 'roomName',
+        title: '公司名称',
+        dataIndex: 'companyName',
       },
       {
-        title: '楼号',
-        dataIndex: 'building',
+        title: '负责人',
+        dataIndex: 'manager',
       },
       {
-        title: '单元/楼层',
-        dataIndex: 'unit',
+        title: '负责人电话',
+        dataIndex: 'managerPhone',
       },
       {
-        title: '定员人数',
-        dataIndex: 'number',
+        title: '日常联系人',
+        dataIndex: 'linkman',
       },
       {
-        title: '默认租金',
-        dataIndex: 'rent',
-        render: (rent: number) => (rent ? rent : null),
+        title: '联系人电话',
+        dataIndex: 'linkmanPhone',
+      },
+      {
+        title: '进驻公寓时间',
+        dataIndex: 'enteredAt',
       },
       {
         title: '备注',
@@ -155,9 +157,9 @@ class Room extends React.Component<Props, State> {
       },
       {
         title: '操作',
-        render: (text: string, record: RoomListItem) => (
+        width: 80,
+        render: (text, record) => (
           <Fragment>
-            <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
             <Divider type="vertical" />
             <a href="">删除</a>
           </Fragment>
@@ -170,14 +172,7 @@ class Room extends React.Component<Props, State> {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button
-                icon="plus"
-                type="primary"
-                onClick={() => this.handleCreateModalVisible(true)}
-              >
-                新建
-              </Button>
-              <Button icon="download" onClick={() => this.handleCreateModalVisible(true)}>
+              <Button icon="download" onClick={this.handleExport}>
                 导出
               </Button>
             </div>
@@ -190,14 +185,9 @@ class Room extends React.Component<Props, State> {
             />
           </div>
         </Card>
-        <CreateForm
-          handleAdd={this.handleAdd}
-          handleModelVisible={this.handleCreateModalVisible}
-          modelVisible={this.state.createModelVisible}
-        />
       </PageHeaderWrapper>
     );
   }
 }
 
-export default Form.create<Props>()(Room);
+export default Form.create<Props>()(Company);

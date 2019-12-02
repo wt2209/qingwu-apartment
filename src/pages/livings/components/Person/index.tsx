@@ -62,14 +62,20 @@ class Person extends React.Component<PersonProps, PersonState> {
           </p>
         </div>
         <div style={{ position: 'absolute', bottom: 6 }}>
+          {/* #00a65a 绿 */}
           <Tag color="#f39c12" style={{ cursor: 'pointer' }}>
-            退房
-          </Tag>
-          <Tag color="#00a65a" style={{ cursor: 'pointer' }}>
             调房
           </Tag>
+          <Tag color="#f39c12" style={{ cursor: 'pointer' }}>
+            修改
+          </Tag>
+          {record.rentStart && (
+            <Tag color="#f39c12" style={{ cursor: 'pointer' }}>
+              续签
+            </Tag>
+          )}
           <Tag color="#dd4b39" style={{ cursor: 'pointer' }}>
-            删除
+            退房
           </Tag>
         </div>
       </Card>
