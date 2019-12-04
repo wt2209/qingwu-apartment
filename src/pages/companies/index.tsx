@@ -155,16 +155,6 @@ class Company extends React.Component<Props, State> {
         title: '备注',
         dataIndex: 'remark',
       },
-      {
-        title: '操作',
-        width: 80,
-        render: (text, record) => (
-          <Fragment>
-            <Divider type="vertical" />
-            <a href="">删除</a>
-          </Fragment>
-        ),
-      },
     ];
     return (
       <PageHeaderWrapper title={false}>

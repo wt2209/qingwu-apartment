@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { Tag, Divider } from 'antd';
+import { LivingFetchParams } from '@/services/living';
 
 const { CheckableTag } = Tag;
 const categories = ['新员工', '单身职工', '劳务派遣工', '随企业搬迁职工', '包商公司'];
@@ -34,12 +35,26 @@ export interface SelectTagsState {
   selectedUnit: string;
 }
 
-class SelectTags extends React.Component {
+interface SelectTagsProps {
+  params: LivingFetchParams;
+  fetchData: (options: LivingFetchParams) => void;
+}
+
+class SelectTags extends React.Component<SelectTagsProps, SelectTagsState> {
   state: SelectTagsState = {
     selectedCategory: '',
     selectedBuilding: '',
     selectedUnit: '',
   };
+  componentDidMount = () => {
+    const { params } = this.props;
+    this.setState({
+      selectedCategory: params.selectedCategory || '',
+      selectedBuilding: params.selectedBuilding || '',
+      selectedUnit: params.selectedUnit || '',
+    });
+  };
+
   handleCategoryChange = (category: string, checked: boolean) => {
     const next = checked ? category : '';
     const result = { ...this.state, selectedCategory: next };
@@ -60,7 +75,7 @@ class SelectTags extends React.Component {
   };
   fetchData = (options: SelectTagsState) => {
     if (options.selectedBuilding !== '' && options.selectedUnit !== '') {
-      console.log(options);
+      this.props.fetchData(options);
     }
   };
   render() {

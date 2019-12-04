@@ -11,3 +11,18 @@ export async function query(params: RoomFetchParams): Promise<any> {
     params,
   });
 }
+
+export interface RoomStoreData {
+  roomName: string;
+  building: string;
+  unit: string;
+  number: number;
+  rent?: number;
+  remark?: string;
+}
+export async function store(data: RoomStoreData): Promise<any> {
+  return request.post('/api/rooms', {
+    method: 'post',
+    data,
+  });
+}

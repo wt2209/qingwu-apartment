@@ -2,7 +2,7 @@ import { Reducer } from 'redux';
 import { Effect } from 'dva';
 import { ListData } from '@/dataTypes/common';
 import { RoomListItem } from '@/dataTypes/listItem';
-import { query } from '@/services/room';
+import { query, store } from '@/services/room';
 
 export interface ModelType {
   namespace: 'rooms';
@@ -15,6 +15,7 @@ export interface ModelType {
   };
   reducers: {
     save: Reducer<ModelState>;
+    append: Reducer<ModelState>;
   };
 }
 
@@ -31,11 +32,20 @@ const Model: ModelType = {
     },
   },
   effects: {
-    *fetch({ payload, callback }, { call, put }) {
+    *fetch({ payload }, { call, put }) {
       const response = yield call(query, payload);
       yield put({ type: 'save', payload: response.data });
     },
-    *add({ payload, callback }, { call, put }) {},
+    *add({ payload, callback }, { call, put }) {
+      const response = yield call(store, payload);
+      yield put({
+        type: 'append',
+        payload: response.data,
+      });
+      if (callback) {
+        callback(response.status);
+      }
+    },
     *remove({ payload, callback }, { call, put }) {},
     *update({ payload, callback }, { call, put }) {},
   },
@@ -44,6 +54,16 @@ const Model: ModelType = {
       return {
         ...state,
         data: action.payload,
+      };
+    },
+    append(state, action) {
+      const newList = state ? state.data.list : [];
+      newList.unshift(action.payload);
+      return {
+        data: {
+          list: newList,
+          pagination: state ? state.data.pagination : {},
+        },
       };
     },
   },

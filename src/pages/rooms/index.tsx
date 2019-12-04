@@ -1,14 +1,27 @@
 import React, { Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Button, Table, Divider, Form, Row, Col, Input, Select, Icon } from 'antd';
+import {
+  Card,
+  Button,
+  Table,
+  Divider,
+  Form,
+  Row,
+  Col,
+  Input,
+  Select,
+  Icon,
+  message,
+  Badge,
+} from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
 import { ModelState } from './model';
 import { connect } from 'dva';
 import CreateForm from './components/CreateForm';
 import styles from '../../styles/index.less';
-import { RoomListItem } from '@/dataTypes/listItem';
-import { RoomFetchParams } from '@/services/room';
+import { RoomListItem, PersonListItem } from '@/dataTypes/listItem';
+import { RoomFetchParams, RoomStoreData } from '@/services/room';
 import { removeEmpty } from '@/utils/tools';
 
 const FormItem = Form.Item;
@@ -55,8 +68,15 @@ class Room extends React.Component<Props, State> {
       createModelVisible: flag,
     });
   };
-  handleAdd = (values: {}) => {
-    console.log(values);
+  handleAdd = (payload: Partial<RoomStoreData>) => {
+    this.props.dispatch({
+      type: 'rooms/add',
+      payload,
+      callback: (status: 'ok' | 'error') => {
+        status === 'ok' ? message.success('添加成功') : message.error('添加失败');
+      },
+    });
+    this.handleCreateModalVisible(false);
   };
   handlePaginationChange = (current: number) => {
     const payload = { ...this.state.params, current };
@@ -85,6 +105,12 @@ class Room extends React.Component<Props, State> {
     this.setState({ params });
     this.fetchData(params);
   };
+
+  // 控制此类型是否在居住首页楼号选择中显示
+  handleChangeStatus = (status: 'show' | 'hide', id: number) => {
+    console.log(id);
+  };
+
   fetchData = (params: RoomFetchParams) => {
     const payload = removeEmpty(params);
     this.props.dispatch({ type: 'rooms/fetch', payload });
@@ -150,6 +176,17 @@ class Room extends React.Component<Props, State> {
         render: (rent: number) => (rent ? rent : null),
       },
       {
+        title: '在居住页显示',
+        dataIndex: 'status',
+        render: (text: 'show' | 'hide') => {
+          return text === 'hide' ? (
+            <Badge status="error" text="已隐藏" />
+          ) : (
+            <Badge status="success" text="已显示" />
+          );
+        },
+      },
+      {
         title: '备注',
         dataIndex: 'remark',
       },
@@ -159,7 +196,12 @@ class Room extends React.Component<Props, State> {
           <Fragment>
             <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
             <Divider type="vertical" />
-            <a href="">删除</a>
+            {record.status === 'hide' && (
+              <a onClick={() => this.handleChangeStatus('show', record.id)}>显示</a>
+            )}
+            {(!record.status || record.status === 'show') && (
+              <a onClick={() => this.handleChangeStatus('hide', record.id)}>隐藏</a>
+            )}
           </Fragment>
         ),
       },

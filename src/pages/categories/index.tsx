@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Button, Table, Divider } from 'antd';
+import { Card, Button, Table, Divider, Badge } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
 import { CategoryModelState } from './model';
@@ -9,11 +9,12 @@ import CreateForm from './components/CreateForm';
 import styles from '../../styles/index.less';
 import { removeEmpty } from '@/utils/tools';
 import { CategoryFetchParams } from '@/services/category';
+import { CategoryListItem } from '@/dataTypes/listItem';
 
 export interface CategoryState {
   params: CategoryFetchParams;
-  createModelVisible: boolean;
-  updateModelVisible: boolean;
+  createModalVisible: boolean;
+  updateModalVisible: boolean;
 }
 
 export interface CategoryProps extends FormComponentProps {
@@ -43,15 +44,15 @@ export interface CategoryProps extends FormComponentProps {
 class Category extends React.Component<CategoryProps, CategoryState> {
   state: CategoryState = {
     params: { current: 1, pageSize: 20 },
-    createModelVisible: false,
-    updateModelVisible: false,
+    createModalVisible: false,
+    updateModalVisible: false,
   };
   componentDidMount = () => {
     this.fetchData(this.state.params);
   };
   handleCreateModalVisible = (flag: boolean) => {
     this.setState({
-      createModelVisible: flag,
+      createModalVisible: flag,
     });
   };
   handleAdd = (values: {}) => {
@@ -60,6 +61,11 @@ class Category extends React.Component<CategoryProps, CategoryState> {
   handlePaginationChange = (current: number, pageSize: number = 20) => {
     const payload = { current, pageSize };
     this.fetchData(payload);
+  };
+
+  // 控制此类型是否在居住首页楼号选择中显示
+  handleChangeStatus = (status: 'show' | 'hide', id: number) => {
+    console.log(id);
   };
   fetchData = (params: CategoryFetchParams) => {
     const payload = removeEmpty(params);
@@ -88,16 +94,32 @@ class Category extends React.Component<CategoryProps, CategoryState> {
         dataIndex: 'utilityType',
       },
       {
+        title: '在居住页显示',
+        dataIndex: 'status',
+        render: (text: 'show' | 'hide') => {
+          return text === 'hide' ? (
+            <Badge status="error" text="已隐藏" />
+          ) : (
+            <Badge status="success" text="已显示" />
+          );
+        },
+      },
+      {
         title: '说明',
         dataIndex: 'remark',
       },
       {
         title: '操作',
-        render: (text, record) => (
+        render: (text: string, record: CategoryListItem) => (
           <Fragment>
             <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
             <Divider type="vertical" />
-            <a href="">删除</a>
+            {record.status === 'hide' && (
+              <a onClick={() => this.handleChangeStatus('show', record.id)}>显示</a>
+            )}
+            {(!record.status || record.status === 'show') && (
+              <a onClick={() => this.handleChangeStatus('hide', record.id)}>隐藏</a>
+            )}
           </Fragment>
         ),
       },
@@ -129,8 +151,8 @@ class Category extends React.Component<CategoryProps, CategoryState> {
         </Card>
         <CreateForm
           handleAdd={this.handleAdd}
-          handleModelVisible={this.handleCreateModalVisible}
-          modelVisible={this.state.createModelVisible}
+          handleModalVisible={this.handleCreateModalVisible}
+          modelVisible={this.state.createModalVisible}
         />
       </PageHeaderWrapper>
     );

@@ -103,4 +103,15 @@ export default {
     rooms.data.pagination.current = parseInt(current);
     res.status(200).send(rooms);
   },
+
+  'POST /api/rooms': (req: Request, res: Response) => {
+    const body = { ...req.body, id: 1001 };
+
+    setTimeout(() => {
+      res.status(200).send({
+        status: 'ok',
+        data: body,
+      });
+    }, 1000);
+  },
 };
