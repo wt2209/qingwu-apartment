@@ -1,8 +1,15 @@
-import { Modal, Form, Steps, Button, Select, Radio, Input, DatePicker } from 'antd';
+import { Modal, Form, Steps, Button, Select, Radio, Input } from 'antd';
 import React from 'react';
 import { FormComponentProps } from 'antd/es/form';
+import { ChargeRule } from '@/dataTypes/common';
 
-interface FormValueType {}
+interface FormValueType {
+  title: string;
+  type: 'person' | 'company';
+  utilityType: string;
+  chargeRules: ChargeRule[];
+  remark: '';
+}
 interface Props extends FormComponentProps {
   modelVisible: boolean;
   handleAdd: (values: {}) => void;
@@ -21,7 +28,13 @@ const { TextArea } = Input;
 
 class CreateForm extends React.Component<Props, State> {
   state: State = {
-    formValues: {},
+    formValues: {
+      title: '',
+      type: 'person',
+      utilityType: '',
+      chargeRules: [],
+      remark: '',
+    },
     currentStep: 0,
   };
 
@@ -43,7 +56,7 @@ class CreateForm extends React.Component<Props, State> {
           formValues,
         },
         () => {
-          if (currentStep < 2) {
+          if (currentStep < 1) {
             this.forward();
           } else {
             handleAdd(formValues);
@@ -105,13 +118,15 @@ class CreateForm extends React.Component<Props, State> {
     }
 
     return [
-      <FormItem key="name" {...this.formLayout} label="名称">
+      <FormItem key="title" {...this.formLayout} label="名称">
         {form.getFieldDecorator('title', {
+          initialValue: formVals.title,
           rules: [{ required: true, message: '请输入类型名称！' }],
         })(<Input placeholder="请输入" />)}
       </FormItem>,
       <FormItem key="desc" {...this.formLayout} label="属于">
         {form.getFieldDecorator('type', {
+          initialValue: formVals.type,
           rules: [{ required: true, message: '必须选择' }],
         })(
           <RadioGroup>
@@ -120,13 +135,15 @@ class CreateForm extends React.Component<Props, State> {
           </RadioGroup>,
         )}
       </FormItem>,
-      <FormItem key="name" {...this.formLayout} label="水电费收费">
+      <FormItem key="utilityType" {...this.formLayout} label="水电费收费">
         {form.getFieldDecorator('utilityType', {
+          initialValue: formVals.utilityType,
           rules: [],
         })(<Input placeholder="请输入" />)}
       </FormItem>,
-      <FormItem key="name" {...this.formLayout} label="备注">
+      <FormItem key="remark" {...this.formLayout} label="备注">
         {form.getFieldDecorator('remark', {
+          initialValue: formVals.remark,
           rules: [],
         })(<TextArea placeholder="请输入" />)}
       </FormItem>,
@@ -156,7 +173,7 @@ class CreateForm extends React.Component<Props, State> {
   };
 
   render() {
-    const { modelVisible, handleModalVisible, handleAdd, form } = this.props;
+    const { modelVisible, handleModalVisible } = this.props;
     const { currentStep, formValues } = this.state;
     return (
       <Modal

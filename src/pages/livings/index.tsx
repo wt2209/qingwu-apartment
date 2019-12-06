@@ -1,11 +1,10 @@
 import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Row, Col, Button, Icon, Divider, Spin } from 'antd';
+import { Card, Row, Col, Button, Icon, Spin } from 'antd';
 import Person from './components/Person';
 import Company from './components/Company';
 import { LivingListItem, RecordListItem } from '@/dataTypes/listItem';
-import SelectTags from './components/SelectTags';
-import SearchBar from './components/SearchBar';
+import SelectTags from './components/SelectAndSearch';
 import { connect } from 'dva';
 import { ModelState } from './model';
 import { Dispatch, Action } from 'redux';
@@ -128,8 +127,6 @@ class Living extends React.Component<Props, State> {
         <Spin spinning={loading || false}>
           <Card style={{ marginBottom: 20 }}>
             <SelectTags fetchData={this.fetchData} params={params} />
-            <Divider dashed style={{ margin: '6px 0' }} />
-            <SearchBar fetchData={this.fetchData} params={params} />
           </Card>
         </Spin>
         <Row gutter={24}>

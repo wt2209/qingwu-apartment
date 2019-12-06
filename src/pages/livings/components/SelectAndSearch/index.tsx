@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react';
-import { Tag, Divider } from 'antd';
+import { Tag, Divider, Input } from 'antd';
 import { LivingFetchParams } from '@/services/living';
 
+const { Search } = Input;
 const { CheckableTag } = Tag;
 const categories = ['新员工', '单身职工', '劳务派遣工', '随企业搬迁职工', '包商公司'];
 const buildings = [
@@ -29,57 +30,85 @@ const buildings = [
 ];
 const units = ['1单元', '2单元', '3单元', '4单元'];
 
-export interface SelectTagsState {
+export interface SelectAndSearchState {
   selectedCategory: string;
   selectedBuilding: string;
   selectedUnit: string;
+  keyword: string;
 }
 
-interface SelectTagsProps {
+interface SelectAndSearchProps {
   params: LivingFetchParams;
   fetchData: (options: LivingFetchParams) => void;
 }
 
-class SelectTags extends React.Component<SelectTagsProps, SelectTagsState> {
-  state: SelectTagsState = {
+class SelectAndSearch extends React.Component<SelectAndSearchProps, SelectAndSearchState> {
+  state: SelectAndSearchState = {
     selectedCategory: '',
     selectedBuilding: '',
     selectedUnit: '',
+    keyword: '',
   };
+
   componentDidMount = () => {
     const { params } = this.props;
     this.setState({
       selectedCategory: params.selectedCategory || '',
       selectedBuilding: params.selectedBuilding || '',
       selectedUnit: params.selectedUnit || '',
+      keyword: params.keyword || '',
     });
+  };
+  componentDidUpdate = (prevProps: SelectAndSearchProps) => {
+    const { params } = this.props;
+    const shouldUpdate = Object.keys(params).some(key => {
+      return params[key] !== prevProps.params[key];
+    });
+    if (shouldUpdate) {
+      this.setState({
+        ...this.state,
+        ...this.props.params,
+      });
+    }
   };
 
   handleCategoryChange = (category: string, checked: boolean) => {
     const next = checked ? category : '';
-    const result = { ...this.state, selectedCategory: next };
+    const result = { ...this.state, selectedCategory: next, keyword: '' };
     this.setState(result);
     this.fetchData(result);
   };
   handleBuildingChange = (building: string, checked: boolean) => {
     const next = checked ? building : '';
-    const result = { ...this.state, selectedBuilding: next, selectedUnit: '' };
+    const result = { ...this.state, selectedBuilding: next, selectedUnit: '', keyword: '' };
     this.setState(result);
-    this.fetchData(result);
   };
   handleUnitChange = (unit: string, checked: boolean) => {
     const next = checked ? unit : '';
-    const result = { ...this.state, selectedUnit: next };
+    const result = { ...this.state, selectedUnit: next, keyword: '' };
     this.setState(result);
-    this.fetchData(result);
-  };
-  fetchData = (options: SelectTagsState) => {
-    if (options.selectedBuilding !== '' && options.selectedUnit !== '') {
-      this.props.fetchData(options);
+    if (this.state.selectedBuilding !== '') {
+      this.fetchData(result);
     }
   };
+  handleKeywordChange = (e: any) => {
+    e.preventDefault();
+    this.setState({
+      selectedCategory: '',
+      selectedUnit: '',
+      selectedBuilding: '',
+      keyword: e.target.value,
+    });
+  };
+  handleSearch = () => {
+    this.fetchData(this.state);
+  };
+  fetchData = (options: Partial<SelectAndSearchState>) => {
+    this.props.fetchData(options);
+  };
   render() {
-    const { selectedCategory, selectedBuilding, selectedUnit } = this.state;
+    const { selectedBuilding, selectedUnit, selectedCategory, keyword } = this.state;
+
     return (
       <Fragment>
         <div>
@@ -123,9 +152,21 @@ class SelectTags extends React.Component<SelectTagsProps, SelectTagsState> {
             </CheckableTag>
           ))}
         </div>
+        <Divider dashed style={{ margin: '6px 0' }} />
+        <div style={{ display: ' flex', alignItems: 'center' }}>
+          <span style={{ marginRight: 8, display: 'inline' }}>搜索：</span>
+          <Search
+            style={{ width: 400 }}
+            placeholder="姓名，房间号，或电话"
+            value={keyword}
+            onChange={e => this.handleKeywordChange(e)}
+            onSearch={() => this.handleSearch()}
+            enterButton
+          />
+        </div>
       </Fragment>
     );
   }
 }
 
-export default SelectTags;
+export default SelectAndSearch;

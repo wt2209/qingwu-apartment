@@ -56,6 +56,7 @@ class Category extends React.Component<CategoryProps, CategoryState> {
     });
   };
   handleAdd = (values: {}) => {
+    this.setState({ createModalVisible: false });
     console.log(values);
   };
   handlePaginationChange = (current: number, pageSize: number = 20) => {
