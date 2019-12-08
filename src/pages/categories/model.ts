@@ -1,8 +1,8 @@
 import { Reducer } from 'redux';
 import { Effect } from 'dva';
-import { ListData } from '@/dataTypes/common';
-import { CategoryListItem } from '@/dataTypes/listItem';
-import { query } from '@/services/category';
+import { ListData } from '@/models/common';
+import { query, store } from '@/services/category';
+import { CategoryListItem } from './data';
 
 export interface CategoryModelType {
   namespace: 'categories';
@@ -15,6 +15,7 @@ export interface CategoryModelType {
   };
   reducers: {
     save: Reducer<CategoryModelState>;
+    append: Reducer<CategoryModelState>;
   };
 }
 
@@ -35,7 +36,16 @@ const CategoryModel: CategoryModelType = {
       const response = yield call(query, payload);
       yield put({ type: 'save', payload: response.data });
     },
-    *add({ payload, callback }, { call, put }) {},
+    *add({ payload, callback }, { call, put }) {
+      const response = yield call(store, payload);
+      yield put({
+        type: 'append',
+        payload: response.data,
+      });
+      if (callback) {
+        callback(response.status);
+      }
+    },
     *remove({ payload, callback }, { call, put }) {},
     *update({ payload, callback }, { call, put }) {},
   },
@@ -44,6 +54,16 @@ const CategoryModel: CategoryModelType = {
       return {
         ...state,
         data: action.payload,
+      };
+    },
+    append(state, action) {
+      const newList = state ? state.data.list : [];
+      newList.unshift(action.payload);
+      return {
+        data: {
+          list: newList,
+          pagination: state ? state.data.pagination : {},
+        },
       };
     },
   },

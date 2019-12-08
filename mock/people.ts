@@ -1,6 +1,6 @@
-import { ResponseListType } from '@/dataTypes/common';
-import { PersonListItem } from '@/dataTypes/listItem';
+import { ResponseListType } from '@/models/common';
 import { Request, Response } from 'express';
+import { PersonListItem } from '@/pages/people/data';
 
 let people: ResponseListType<PersonListItem> = {
   status: 'ok',

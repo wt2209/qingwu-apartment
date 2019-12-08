@@ -1,6 +1,6 @@
-import { ResponseListType } from '@/dataTypes/common';
-import { RoomListItem } from '@/dataTypes/listItem';
+import { ResponseListType } from '@/models/common';
 import { Request, Response } from 'express';
+import { RoomListItem } from '@/pages/rooms/data';
 
 let rooms: ResponseListType<RoomListItem> = {
   status: 'ok',

@@ -1,8 +1,8 @@
 import { Reducer } from 'redux';
 import { Effect } from 'dva';
-import { ListData } from '@/dataTypes/common';
-import { CompanyListItem } from '@/dataTypes/listItem';
+import { ListData } from '@/models/common';
 import { query } from '@/services/company';
+import { CompanyListItem } from './data';
 
 export interface ModelType {
   namespace: 'companies';

@@ -1,8 +1,6 @@
-import { ResponseListType } from '@/dataTypes/common';
-import { LivingListItem } from '@/dataTypes/listItem';
 import { Request, Response } from 'express';
 
-let livings: ResponseListType<LivingListItem> = {
+let livings = {
   status: 'ok',
   data: {
     list: [
@@ -36,7 +34,7 @@ let livings: ResponseListType<LivingListItem> = {
             recordAt: '2019-11-11',
             rentStart: '2019-12-1',
             rentEnd: '2020-12-3',
-            status: 'living',
+            status: 'using',
           },
         ],
       },
@@ -76,7 +74,7 @@ let livings: ResponseListType<LivingListItem> = {
             recordAt: '2019-11-11',
             rentStart: '',
             rentEnd: '',
-            status: 'living',
+            status: 'using',
           },
           {
             id: 4,
@@ -106,7 +104,7 @@ let livings: ResponseListType<LivingListItem> = {
             recordAt: '2019-11-11',
             rentStart: '2019-11-11',
             rentEnd: '2019-11-11',
-            status: 'living',
+            status: 'using',
           },
         ],
       },
@@ -140,7 +138,7 @@ let livings: ResponseListType<LivingListItem> = {
             recordAt: '2019-11-11',
             rentStart: '',
             rentEnd: '',
-            status: 'living',
+            status: 'using',
           },
         ],
       },
@@ -180,7 +178,34 @@ let livings: ResponseListType<LivingListItem> = {
             recordAt: '2019-11-11',
             rentStart: '2019-11-11',
             rentEnd: '2019-11-11',
-            status: 'living',
+            status: 'using',
+          },
+        ],
+      },
+      {
+        id: 5,
+        roomName: '4-3-101',
+        building: '4#',
+        unit: '3单元',
+        number: 1,
+        remark: '房间的说明',
+        records: [
+          {
+            id: 14,
+            type: 'functional',
+            category: {
+              type: 'functional',
+              title: '仓库',
+            },
+            room: {
+              roomName: '3-3-101',
+            },
+            company: {},
+            person: {},
+            recordAt: '2019-11-11',
+            rentStart: '',
+            rentEnd: '',
+            status: 'using',
           },
         ],
       },

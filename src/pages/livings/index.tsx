@@ -11,6 +11,8 @@ import { Dispatch, Action } from 'redux';
 import { FormComponentProps } from 'antd/es/form';
 import { LivingFetchParams } from '@/services/living';
 import { removeEmpty } from '@/utils/tools';
+import Center from '../account/center';
+import Functional from './components/Functional';
 
 export interface Props extends FormComponentProps {
   dispatch: Dispatch<Action<'livings/add' | 'livings/fetch' | 'livings/remove' | 'livings/update'>>;
@@ -56,6 +58,9 @@ class Living extends React.Component<Props, State> {
             break;
           case 'company':
             result.push(this.renderCompany(record, width));
+            break;
+          case 'functional':
+            result.push(this.renderFunctional(record, width));
             break;
           default:
             result.push(null);
@@ -106,6 +111,20 @@ class Living extends React.Component<Props, State> {
     );
   };
 
+  renderFunctional = (record: RecordListItem, width: string) => {
+    return (
+      <Card.Grid
+        key={'functional' + record.id}
+        style={{
+          padding: 0,
+          margin: '0.5%',
+          width,
+        }}
+      >
+        <Functional record={record} />
+      </Card.Grid>
+    );
+  };
   renderLivingTitle = (living: { roomName: string; remark: string }) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>

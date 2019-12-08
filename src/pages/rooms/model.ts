@@ -1,8 +1,8 @@
 import { Reducer } from 'redux';
 import { Effect } from 'dva';
-import { ListData } from '@/dataTypes/common';
-import { RoomListItem } from '@/dataTypes/listItem';
+import { ListData } from '@/models/common';
 import { query, store } from '@/services/room';
+import { RoomListItem } from './data';
 
 export interface ModelType {
   namespace: 'rooms';

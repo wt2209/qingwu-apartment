@@ -1,4 +1,4 @@
-import { ResponseListType } from '@/dataTypes/common';
+import { ResponseListType } from '@/models/common';
 import { CategoryListItem } from '@/dataTypes/listItem';
 import { Request, Response } from 'express';
 
@@ -12,7 +12,9 @@ let categories: ResponseListType<CategoryListItem> = {
         type: 'person',
         utilityType: '收取超费',
         // 默认的其他收费规则，作为入住记录收费规则的参考
-        chargeRules: [],
+        chargeRules: {
+          床位费: [],
+        },
         remark: '说明',
       },
       {
@@ -21,12 +23,9 @@ let categories: ResponseListType<CategoryListItem> = {
         type: 'person',
         utilityType: '收取超费',
         // 默认的其他收费规则，作为入住记录收费规则的参考
-        chargeRules: [
-          {
-            name: '床位费',
-            fee: [430, 230, 230, 230, 230],
-          },
-        ],
+        chargeRules: {
+          床位费: [430, 230, 230, 230, 230],
+        },
         remark: '说明',
       },
       {
@@ -35,12 +34,9 @@ let categories: ResponseListType<CategoryListItem> = {
         type: 'person',
         utilityType: '全额收取',
         // 默认的其他收费规则，作为入住记录收费规则的参考
-        chargeRules: [
-          {
-            name: '床位费',
-            fee: [100],
-          },
-        ],
+        chargeRules: {
+          床位费: [100],
+        },
         remark: '说明',
       },
       {
@@ -49,7 +45,10 @@ let categories: ResponseListType<CategoryListItem> = {
         type: 'person',
         utilityType: '全额收取',
         // 默认的其他收费规则，作为入住记录收费规则的参考
-        chargeRules: [],
+        chargeRules: {
+          租赁房租: [900, 600, 700, 800],
+          物业费: [98, 98, 98, 98],
+        },
         remark: '说明',
       },
       {
@@ -58,12 +57,7 @@ let categories: ResponseListType<CategoryListItem> = {
         type: 'company',
         utilityType: '全额收取',
         // 默认的其他收费规则，作为入住记录收费规则的参考
-        chargeRules: [
-          {
-            name: '租赁房租',
-            fee: [1000, 700, 800, 900],
-          },
-        ],
+        chargeRules: {},
         remark: '说明123',
       },
     ],
@@ -81,5 +75,16 @@ export default {
     categories.data.pagination.pageSize = parseInt(pageSize);
     categories.data.pagination.current = parseInt(current);
     res.status(200).send(categories);
+  },
+
+  'POST /api/categories': (req: Request, res: Response) => {
+    const body = { ...req.body, id: 1001 };
+
+    setTimeout(() => {
+      res.status(200).send({
+        status: 'ok',
+        data: body,
+      });
+    }, 1000);
   },
 };

@@ -1,8 +1,8 @@
 import { Reducer } from 'redux';
 import { Effect } from 'dva';
-import { ListData } from '@/dataTypes/common';
-import { PersonListItem } from '@/dataTypes/listItem';
+import { ListData } from '@/models/common';
 import { query } from '@/services/person';
+import { PersonListItem } from './data';
 
 export interface ModelType {
   namespace: 'people';

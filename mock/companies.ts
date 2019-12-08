@@ -1,6 +1,6 @@
-import { ResponseListType } from '@/dataTypes/common';
-import { CompanyListItem } from '@/dataTypes/listItem';
+import { ResponseListType } from '@/models/common';
 import { Request, Response } from 'express';
+import { CompanyListItem } from '@/pages/companies/data';
 
 let companies: ResponseListType<CompanyListItem> = {
   status: 'ok',

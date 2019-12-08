@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Button, Table, Divider, Badge } from 'antd';
+import { Card, Button, Table, Divider, Badge, message } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
 import { CategoryModelState } from './model';
@@ -8,8 +8,10 @@ import { connect } from 'dva';
 import CreateForm from './components/CreateForm';
 import styles from '../../styles/index.less';
 import { removeEmpty } from '@/utils/tools';
-import { CategoryFetchParams } from '@/services/category';
-import { CategoryListItem } from '@/dataTypes/listItem';
+import { CategoryFetchParams, CategoryStoreData } from '@/services/category';
+import FeeShow from '@/components/FeeShow';
+import { CategoryTypeMapper } from '@/mappers';
+import { CategoryListItem } from './data';
 
 export interface CategoryState {
   params: CategoryFetchParams;
@@ -55,9 +57,15 @@ class Category extends React.Component<CategoryProps, CategoryState> {
       createModalVisible: flag,
     });
   };
-  handleAdd = (values: {}) => {
+  handleAdd = (payload: CategoryStoreData) => {
     this.setState({ createModalVisible: false });
-    console.log(values);
+    this.props.dispatch({
+      type: 'categories/add',
+      payload,
+      callback: (status: 'ok' | 'error') => {
+        status === 'ok' ? message.success('添加成功') : message.error('添加失败');
+      },
+    });
   };
   handlePaginationChange = (current: number, pageSize: number = 20) => {
     const payload = { current, pageSize };
@@ -67,6 +75,13 @@ class Category extends React.Component<CategoryProps, CategoryState> {
   // 控制此类型是否在居住首页楼号选择中显示
   handleChangeStatus = (status: 'show' | 'hide', id: number) => {
     console.log(id);
+  };
+  expandedRowRender = (record: CategoryListItem) => {
+    return Object.values(record.chargeRules).length > 0 ? (
+      <FeeShow fees={record.chargeRules} />
+    ) : (
+      '不收费'
+    );
   };
   fetchData = (params: CategoryFetchParams) => {
     const payload = removeEmpty(params);
@@ -88,7 +103,9 @@ class Category extends React.Component<CategoryProps, CategoryState> {
       {
         title: '属于',
         dataIndex: 'type',
-        render: (text: string) => (text === 'person' ? '个人居住' : '公司或机构入住'),
+        render: (text: string) => {
+          return CategoryTypeMapper[text];
+        },
       },
       {
         title: '水电费收费',
@@ -143,6 +160,7 @@ class Category extends React.Component<CategoryProps, CategoryState> {
             </div>
             <Table
               rowKey="id"
+              expandedRowRender={this.expandedRowRender}
               pagination={{ ...pagination, onChange: this.handlePaginationChange }}
               columns={columns}
               dataSource={list}

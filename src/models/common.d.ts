@@ -9,10 +9,7 @@ export interface ListData<T> {
 
 // 缴费规则
 export interface ChargeRule {
-  name: string;
-  fee: Array<number>;
-  discountType?: 'money' | 'percent';
-  discount?: Array<number>;
+  [key: string]: number[];
 }
 
 // 后端返回的数组结果

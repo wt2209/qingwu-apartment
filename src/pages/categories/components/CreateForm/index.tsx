@@ -1,18 +1,21 @@
-import { Modal, Form, Steps, Button, Select, Radio, Input } from 'antd';
+import { Modal, Form, Steps, Button, Radio, Input } from 'antd';
 import React from 'react';
 import { FormComponentProps } from 'antd/es/form';
-import { ChargeRule } from '@/dataTypes/common';
+import { ChargeRule } from '@/models/common';
+import FeeSetting from '@/components/FeeSetting';
+import { CategoryStoreData } from '@/services/category';
+import { CategoryTypeMapper } from '@/mappers';
 
 interface FormValueType {
   title: string;
-  type: 'person' | 'company';
+  type: 'person' | 'company' | 'functional';
   utilityType: string;
   chargeRules: ChargeRule[];
   remark: '';
 }
 interface Props extends FormComponentProps {
   modelVisible: boolean;
-  handleAdd: (values: {}) => void;
+  handleAdd: (values: CategoryStoreData) => void;
   handleModalVisible: (flag: boolean) => void;
 }
 interface State {
@@ -21,12 +24,12 @@ interface State {
 }
 
 const { Step } = Steps;
-const { Option } = Select;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
 
 class CreateForm extends React.Component<Props, State> {
+  feeFormRef = { submit: (result: any) => {} };
   state: State = {
     formValues: {
       title: '',
@@ -43,10 +46,8 @@ class CreateForm extends React.Component<Props, State> {
     wrapperCol: { span: 13 },
   };
 
-  okHandler = () => {};
-
   handleNext = (currentStep: number) => {
-    const { form, handleAdd } = this.props;
+    const { form } = this.props;
     const { formValues: oldValue } = this.state;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -58,11 +59,29 @@ class CreateForm extends React.Component<Props, State> {
         () => {
           if (currentStep < 1) {
             this.forward();
-          } else {
-            handleAdd(formValues);
           }
         },
       );
+    });
+  };
+
+  handleComplete = () => {
+    this.feeFormRef.submit((result: any) => {
+      const values = {
+        ...this.state.formValues,
+        chargeRules: result,
+      };
+      this.setState({
+        formValues: {
+          title: '',
+          type: 'person',
+          utilityType: '',
+          chargeRules: [],
+          remark: '',
+        },
+        currentStep: 0,
+      });
+      this.props.handleAdd(values);
     });
   };
 
@@ -84,36 +103,7 @@ class CreateForm extends React.Component<Props, State> {
     const { form } = this.props;
     if (currentStep === 1) {
       return [
-        <FormItem key="target" {...this.formLayout} label="监控对象">
-          {form.getFieldDecorator('target', {
-            initialValue: formVals.target,
-          })(
-            <Select style={{ width: '100%' }}>
-              <Option value="0">表一</Option>
-              <Option value="1">表二</Option>
-            </Select>,
-          )}
-        </FormItem>,
-        <FormItem key="template" {...this.formLayout} label="规则模板">
-          {form.getFieldDecorator('template', {
-            initialValue: formVals.template,
-          })(
-            <Select style={{ width: '100%' }}>
-              <Option value="0">规则模板一</Option>
-              <Option value="1">规则模板二</Option>
-            </Select>,
-          )}
-        </FormItem>,
-        <FormItem key="type" {...this.formLayout} label="规则类型">
-          {form.getFieldDecorator('type', {
-            initialValue: formVals.type,
-          })(
-            <RadioGroup>
-              <Radio value="0">强</Radio>
-              <Radio value="1">弱</Radio>
-            </RadioGroup>,
-          )}
-        </FormItem>,
+        <FeeSetting key="feeForm" wrappedComponentRef={(form: any) => (this.feeFormRef = form)} />,
       ];
     }
 
@@ -130,8 +120,9 @@ class CreateForm extends React.Component<Props, State> {
           rules: [{ required: true, message: '必须选择' }],
         })(
           <RadioGroup>
-            <Radio value="person">个人入住</Radio>
-            <Radio value="company">公司或机构入住</Radio>
+            <Radio value="person">{CategoryTypeMapper['person']}</Radio>
+            <Radio value="company">{CategoryTypeMapper['company']}</Radio>
+            <Radio value="functional">{CategoryTypeMapper['functional']}</Radio>
           </RadioGroup>,
         )}
       </FormItem>,
@@ -157,7 +148,7 @@ class CreateForm extends React.Component<Props, State> {
         <Button key="back" onClick={this.backward}>
           上一步
         </Button>,
-        <Button key="submit" type="primary" onClick={() => this.handleNext(currentStep)}>
+        <Button key="submit" type="primary" onClick={() => this.handleComplete()}>
           完成
         </Button>,
       ];
@@ -177,7 +168,7 @@ class CreateForm extends React.Component<Props, State> {
     const { currentStep, formValues } = this.state;
     return (
       <Modal
-        width={640}
+        width={800}
         bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
         title="规则配置"
