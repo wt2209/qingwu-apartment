@@ -1,6 +1,6 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Table, Button, Form, Row, Col, Input, Divider } from 'antd';
+import { Card, Table, Button, Form, Row, Col, Input } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
 import { ModelState } from './model';

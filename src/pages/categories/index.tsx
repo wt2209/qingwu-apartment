@@ -10,8 +10,8 @@ import { removeEmpty } from '@/utils/tools';
 import { CategoryFetchParams, CategoryStoreData } from '@/services/category';
 import FeeShow from '@/components/FeeShow';
 import { CategoryTypeMapper } from '@/mappers';
-import { CategoryListItem } from './data';
 import CreateOrUpdateForm, { FormValueType } from './components/CreateOrUpdateForm';
+import { CategoryListItem } from './data';
 
 export interface CategoryState {
   params: CategoryFetchParams;
@@ -112,11 +112,8 @@ class Category extends React.Component<CategoryProps, CategoryState> {
     console.log('export');
   };
 
-  expandedRowRender = (record: CategoryListItem) => (Object.values(record.chargeRules).length > 0 ? (
-      <FeeShow fees={record.chargeRules} />
-    ) : (
-      '不收费'
-    ));
+  expandedRowRender = (record: CategoryListItem) =>
+    Object.values(record.chargeRules).length > 0 ? <FeeShow fees={record.chargeRules} /> : '不收费';
 
   fetchData = (params: CategoryFetchParams) => {
     const payload = removeEmpty(params);
@@ -147,11 +144,12 @@ class Category extends React.Component<CategoryProps, CategoryState> {
       {
         title: '在居住页显示',
         dataIndex: 'status',
-        render: (text: 'show' | 'hide') => (text === 'hide' ? (
+        render: (text: 'show' | 'hide') =>
+          text === 'hide' ? (
             <Badge status="error" text="已隐藏" />
           ) : (
             <Badge status="success" text="已显示" />
-          )),
+          ),
       },
       {
         title: '说明',

@@ -1,6 +1,3 @@
-import { AnyAction } from 'redux';
-import { EffectsCommandMap } from 'dva';
-
 // model 中使用的 listdata
 export interface ListData<T> {
   list: T[];
