@@ -1,18 +1,18 @@
 import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Card, Row, Col, Button, Icon, Spin } from 'antd';
-import Person from './components/Person';
-import Company from './components/Company';
-import { LivingListItem, RecordListItem } from '@/dataTypes/listItem';
-import SelectTags from './components/SelectAndSearch';
 import { connect } from 'dva';
-import { ModelState } from './model';
 import { Dispatch, Action } from 'redux';
 import { FormComponentProps } from 'antd/es/form';
+import Person from './components/Person';
+import Company from './components/Company';
+import SelectTags from './components/SelectAndSearch';
+import { ModelState } from './model';
 import { LivingFetchParams } from '@/services/living';
 import { removeEmpty } from '@/utils/tools';
-import Center from '../account/center';
 import Functional from './components/Functional';
+import { LivingListItem } from './data';
+import { RecordListItem } from '../records/data';
 
 export interface Props extends FormComponentProps {
   dispatch: Dispatch<Action<'livings/add' | 'livings/fetch' | 'livings/remove' | 'livings/update'>>;
@@ -48,7 +48,7 @@ class Living extends React.Component<Props, State> {
   renderContent = (living: LivingListItem) => {
     const number = Math.max(living.number, living.records.length);
     const width = number === 1 ? '99%' : '49%';
-    let result = [];
+    const result = [];
     for (let i = 0; i < number; i++) {
       const record = living.records[i];
       if (record) {
@@ -67,7 +67,7 @@ class Living extends React.Component<Props, State> {
         }
       } else {
         result.push(
-          <Card.Grid key={'empty' + living.id + i} style={{ padding: 0, margin: '0.5%', width }}>
+          <Card.Grid key={`empty${living.id}${i}`} style={{ padding: 0, margin: '0.5%', width }}>
             <Button
               type="dashed"
               style={{ border: '0', backgroundColor: '#5dade2', width: '100%', height: 225 }}
@@ -81,58 +81,51 @@ class Living extends React.Component<Props, State> {
     return result;
   };
 
-  renderCompany = (record: RecordListItem, width: string) => {
-    return (
-      <Card.Grid
-        key={'company' + record.id}
-        style={{
-          padding: 0,
-          margin: '0.5%',
-          width,
-        }}
-      >
-        <Company record={record} />
-      </Card.Grid>
-    );
-  };
+  renderCompany = (record: RecordListItem, width: string) => (
+    <Card.Grid
+      key={`company${record.id}`}
+      style={{
+        padding: 0,
+        margin: '0.5%',
+        width,
+      }}
+    >
+      <Company record={record} />
+    </Card.Grid>
+  );
 
-  renderPeople = (record: RecordListItem, width: string) => {
-    return (
-      <Card.Grid
-        key={'person' + record.id}
-        style={{
-          padding: 0,
-          margin: '0.5%',
-          width,
-        }}
-      >
-        <Person record={record} />
-      </Card.Grid>
-    );
-  };
+  renderPeople = (record: RecordListItem, width: string) => (
+    <Card.Grid
+      key={`person${record.id}`}
+      style={{
+        padding: 0,
+        margin: '0.5%',
+        width,
+      }}
+    >
+      <Person record={record} />
+    </Card.Grid>
+  );
 
-  renderFunctional = (record: RecordListItem, width: string) => {
-    return (
-      <Card.Grid
-        key={'functional' + record.id}
-        style={{
-          padding: 0,
-          margin: '0.5%',
-          width,
-        }}
-      >
-        <Functional record={record} />
-      </Card.Grid>
-    );
-  };
-  renderLivingTitle = (living: { roomName: string; remark: string }) => {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div style={{ fontSize: 18, fontWeight: 'bold', flex: 2 }}>{living.roomName}</div>
-        <div style={{ fontSize: 14, flex: 4 }}>{living.remark}</div>
-      </div>
-    );
-  };
+  renderFunctional = (record: RecordListItem, width: string) => (
+    <Card.Grid
+      key={`functional${record.id}`}
+      style={{
+        padding: 0,
+        margin: '0.5%',
+        width,
+      }}
+    >
+      <Functional record={record} />
+    </Card.Grid>
+  );
+
+  renderLivingTitle = (living: { roomName: string; remark: string }) => (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ fontSize: 18, fontWeight: 'bold', flex: 2 }}>{living.roomName}</div>
+      <div style={{ fontSize: 14, flex: 4 }}>{living.remark}</div>
+    </div>
+  );
 
   render() {
     const { livings, loading } = this.props;

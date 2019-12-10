@@ -1,7 +1,7 @@
 export interface CategoryListItem {
   id: number;
   title: string;
-  type: 'person' | 'company' | 'functional'; //个人居住，公司或机构，功能性用房（仓库等）
+  type: 'person' | 'company' | 'functional'; // 个人居住，公司或机构，功能性用房（仓库等）
   utilityType: string;
   chargeRules: {
     [key: string]: number[];

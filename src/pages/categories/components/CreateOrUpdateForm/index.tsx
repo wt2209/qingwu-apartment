@@ -33,6 +33,7 @@ const { TextArea } = Input;
 
 class CreateOrUpdateForm extends React.Component<Props, State> {
   feeFormRef = { submit: (result: any) => {} };
+
   state: State = {
     formValues: {
       id: 0,
@@ -152,9 +153,9 @@ class CreateOrUpdateForm extends React.Component<Props, State> {
           rules: [{ required: true, message: '必须选择' }],
         })(
           <RadioGroup>
-            <Radio value="person">{CategoryTypeMapper['person']}</Radio>
-            <Radio value="company">{CategoryTypeMapper['company']}</Radio>
-            <Radio value="functional">{CategoryTypeMapper['functional']}</Radio>
+            <Radio value="person">{CategoryTypeMapper.person}</Radio>
+            <Radio value="company">{CategoryTypeMapper.company}</Radio>
+            <Radio value="functional">{CategoryTypeMapper.functional}</Radio>
           </RadioGroup>,
         )}
       </FormItem>,

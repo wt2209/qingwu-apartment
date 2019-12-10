@@ -68,11 +68,11 @@ request.interceptors.request.use((url, options) => {
   // https://umijs.org/zh/guide/with-dva.html#faq
 
   // @ts-ignore
-  const token = window.g_app._store.getState().login.token
+  const { token } = window.g_app._store.getState().login
 
   options.headers = {
     ...options.headers,
-    Authorization: `Bearer ${token}`
+    Authorization: `Bearer ${token}`,
   }
   return (
     {

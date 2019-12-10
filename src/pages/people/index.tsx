@@ -1,6 +1,6 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Card, Table, Button, Form, Row, Col, Input, Divider } from 'antd';
+import { Card, Table, Button, Form, Row, Col, Input } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
 import { ModelState } from './model';
@@ -44,19 +44,24 @@ class Room extends React.Component<Props, State> {
       pageSize: 20,
     },
   };
+
   componentDidMount = () => {
     this.fetchData(this.state.params);
   };
+
   handleAdd = (values: {}) => {
     console.log(values);
   };
+
   handlePaginationChange = (current: number) => {
     const payload = { ...this.state.params, current };
     this.fetchData(payload);
   };
+
   handleExport = () => {
     console.log('export');
   };
+
   handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const { form } = this.props;
@@ -70,6 +75,7 @@ class Room extends React.Component<Props, State> {
       this.fetchData(params);
     });
   };
+
   handleFormReset = () => {
     const { current, pageSize } = this.state.params;
     const params = { current, pageSize };
@@ -77,6 +83,7 @@ class Room extends React.Component<Props, State> {
     this.setState({ params });
     this.fetchData(params);
   };
+
   fetchData = (params: PersonFetchParams) => {
     const payload = removeEmpty(params);
     this.props.dispatch({ type: 'people/fetch', payload });
@@ -122,6 +129,7 @@ class Room extends React.Component<Props, State> {
       </Form>
     );
   };
+
   render() {
     const {
       people: { data },

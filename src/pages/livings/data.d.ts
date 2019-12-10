@@ -1,3 +1,5 @@
+import { RecordListItem } from '../records/data';
+
 // 已房间为主题，计算出来的 “居住情况”
 export interface LivingListItem {
   id: number;

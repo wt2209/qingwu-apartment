@@ -3,8 +3,8 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Card, Button, Table, Divider, Form, Row, Col, Input, message, Badge } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
-import { ModelState } from './model';
 import { connect } from 'dva';
+import { ModelState } from './model';
 import CreateOrUpdateForm from './components/CreateOrUpdateForm';
 import styles from '../../styles/index.less';
 import { RoomFetchParams } from '@/services/room';
@@ -55,12 +55,15 @@ class Room extends React.Component<Props, State> {
       remark: '',
     },
   };
+
   componentDidMount = () => {
     this.fetchData(this.state.params);
   };
+
   handleModalVisible = (flag: boolean) => {
     this.setState({ modalVisible: flag });
   };
+
   handleAdd = () => {
     this.setState({
       currentRoom: {
@@ -75,12 +78,14 @@ class Room extends React.Component<Props, State> {
       modalVisible: true,
     });
   };
+
   handleEdit = (record: RoomFormValueType) => {
     this.setState({
       currentRoom: record,
       modalVisible: true,
     });
   };
+
   handleSubmit = (payload: RoomFormValueType) => {
     const type = payload.id > 0 ? 'rooms/update' : 'rooms/add';
     this.props.dispatch({
@@ -94,13 +99,16 @@ class Room extends React.Component<Props, State> {
       modalVisible: false,
     });
   };
+
   handlePaginationChange = (current: number) => {
     const payload = { ...this.state.params, current };
     this.fetchData(payload);
   };
+
   handleExport = () => {
     console.log('export');
   };
+
   handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const { form } = this.props;
@@ -114,6 +122,7 @@ class Room extends React.Component<Props, State> {
       this.fetchData(params);
     });
   };
+
   handleFormReset = () => {
     const { current, pageSize } = this.state.params;
     const params = { current, pageSize };
@@ -162,6 +171,7 @@ class Room extends React.Component<Props, State> {
       </Form>
     );
   };
+
   render() {
     const {
       rooms: { data },
@@ -189,18 +199,16 @@ class Room extends React.Component<Props, State> {
       {
         title: '默认租金',
         dataIndex: 'rent',
-        render: (rent: number) => (rent ? rent : null),
+        render: (rent: number) => (rent || null),
       },
       {
         title: '在居住页显示',
         dataIndex: 'status',
-        render: (text: 'show' | 'hide') => {
-          return text === 'hide' ? (
+        render: (text: 'show' | 'hide') => (text === 'hide' ? (
             <Badge status="error" text="已隐藏" />
           ) : (
             <Badge status="success" text="已显示" />
-          );
-        },
+          )),
       },
       {
         title: '备注',

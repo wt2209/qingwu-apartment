@@ -31,7 +31,7 @@ const Model: ModelType = {
     },
   },
   effects: {
-    *fetch({ payload, callback }, { call, put }) {
+    *fetch({ payload }, { call, put }) {
       const response = yield call(query, payload);
       yield put({ type: 'save', payload: response.data });
     },

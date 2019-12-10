@@ -3,8 +3,8 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Card, Button, Table, Divider, Badge, message } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
-import { CategoryModelState } from './model';
 import { connect } from 'dva';
+import { CategoryModelState } from './model';
 import styles from '../../styles/index.less';
 import { removeEmpty } from '@/utils/tools';
 import { CategoryFetchParams, CategoryStoreData } from '@/services/category';
@@ -56,9 +56,11 @@ class Category extends React.Component<CategoryProps, CategoryState> {
       remark: '',
     },
   };
+
   componentDidMount = () => {
     this.fetchData(this.state.params);
   };
+
   handleAdd = () => {
     this.setState({
       modalVisible: true,
@@ -72,15 +74,18 @@ class Category extends React.Component<CategoryProps, CategoryState> {
       },
     });
   };
+
   handleEdit = (record: FormValueType) => {
     this.setState({
       modalVisible: true,
       currentItem: record,
     });
   };
+
   handleModalHide = () => {
     this.setState({ modalVisible: false });
   };
+
   handleSubmit = (payload: CategoryStoreData) => {
     this.setState({ modalVisible: false });
     const type = payload.id > 0 ? 'categories/update' : 'categories/add';
@@ -102,16 +107,17 @@ class Category extends React.Component<CategoryProps, CategoryState> {
   handleChangeStatus = (status: 'show' | 'hide', id: number) => {
     console.log(id);
   };
+
   handleExport = () => {
     console.log('export');
   };
-  expandedRowRender = (record: CategoryListItem) => {
-    return Object.values(record.chargeRules).length > 0 ? (
+
+  expandedRowRender = (record: CategoryListItem) => (Object.values(record.chargeRules).length > 0 ? (
       <FeeShow fees={record.chargeRules} />
     ) : (
       '不收费'
-    );
-  };
+    ));
+
   fetchData = (params: CategoryFetchParams) => {
     const payload = removeEmpty(params);
     this.props.dispatch({ type: 'categories/fetch', payload });
@@ -132,9 +138,7 @@ class Category extends React.Component<CategoryProps, CategoryState> {
       {
         title: '属于',
         dataIndex: 'type',
-        render: (text: string) => {
-          return CategoryTypeMapper[text];
-        },
+        render: (text: string) => CategoryTypeMapper[text],
       },
       {
         title: '水电费收费',
@@ -143,13 +147,11 @@ class Category extends React.Component<CategoryProps, CategoryState> {
       {
         title: '在居住页显示',
         dataIndex: 'status',
-        render: (text: 'show' | 'hide') => {
-          return text === 'hide' ? (
+        render: (text: 'show' | 'hide') => (text === 'hide' ? (
             <Badge status="error" text="已隐藏" />
           ) : (
             <Badge status="success" text="已显示" />
-          );
-        },
+          )),
       },
       {
         title: '说明',

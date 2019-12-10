@@ -46,19 +46,24 @@ class Company extends React.Component<Props, State> {
       pageSize: 20,
     },
   };
+
   componentDidMount = () => {
     this.fetchData(this.state.params);
   };
+
   handleAdd = (values: {}) => {
     console.log(values);
   };
+
   handlePaginationChange = (current: number) => {
     const payload = { ...this.state.params, current };
     this.fetchData(payload);
   };
+
   handleExport = () => {
     console.log('export');
   };
+
   handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const { form } = this.props;
@@ -72,6 +77,7 @@ class Company extends React.Component<Props, State> {
       this.fetchData(params);
     });
   };
+
   handleFormReset = () => {
     const { current, pageSize } = this.state.params;
     const params = { current, pageSize };
@@ -79,6 +85,7 @@ class Company extends React.Component<Props, State> {
     this.setState({ params });
     this.fetchData(params);
   };
+
   fetchData = (params: CompanyFetchParams) => {
     const payload = removeEmpty(params);
     this.props.dispatch({ type: 'companies/fetch', payload });
@@ -119,6 +126,7 @@ class Company extends React.Component<Props, State> {
       </Form>
     );
   };
+
   render() {
     const {
       companies: { data },

@@ -59,11 +59,10 @@ class SelectAndSearch extends React.Component<SelectAndSearchProps, SelectAndSea
       keyword: params.keyword || '',
     });
   };
+
   componentDidUpdate = (prevProps: SelectAndSearchProps) => {
     const { params } = this.props;
-    const shouldUpdate = Object.keys(params).some(key => {
-      return params[key] !== prevProps.params[key];
-    });
+    const shouldUpdate = Object.keys(params).some(key => params[key] !== prevProps.params[key]);
     if (shouldUpdate) {
       this.setState({
         ...this.state,
@@ -78,11 +77,13 @@ class SelectAndSearch extends React.Component<SelectAndSearchProps, SelectAndSea
     this.setState(result);
     this.fetchData(result);
   };
+
   handleBuildingChange = (building: string, checked: boolean) => {
     const next = checked ? building : '';
     const result = { ...this.state, selectedBuilding: next, selectedUnit: '', keyword: '' };
     this.setState(result);
   };
+
   handleUnitChange = (unit: string, checked: boolean) => {
     const next = checked ? unit : '';
     const result = { ...this.state, selectedUnit: next, keyword: '' };
@@ -91,6 +92,7 @@ class SelectAndSearch extends React.Component<SelectAndSearchProps, SelectAndSea
       this.fetchData(result);
     }
   };
+
   handleKeywordChange = (e: any) => {
     e.preventDefault();
     this.setState({
@@ -100,12 +102,15 @@ class SelectAndSearch extends React.Component<SelectAndSearchProps, SelectAndSea
       keyword: e.target.value,
     });
   };
+
   handleSearch = () => {
     this.fetchData(this.state);
   };
+
   fetchData = (options: Partial<SelectAndSearchState>) => {
     this.props.fetchData(options);
   };
+
   render() {
     const { selectedBuilding, selectedUnit, selectedCategory, keyword } = this.state;
 
@@ -116,7 +121,7 @@ class SelectAndSearch extends React.Component<SelectAndSearchProps, SelectAndSea
           {categories.map((category: string) => (
             <CheckableTag
               style={{ fontSize: 14 }}
-              key={'category' + category}
+              key={`category${category}`}
               checked={selectedCategory === category}
               onChange={checked => this.handleCategoryChange(category, checked)}
             >
@@ -130,7 +135,7 @@ class SelectAndSearch extends React.Component<SelectAndSearchProps, SelectAndSea
           {buildings.map((building: string) => (
             <CheckableTag
               style={{ fontSize: 14 }}
-              key={'building' + building}
+              key={`building${building}`}
               checked={selectedBuilding === building}
               onChange={checked => this.handleBuildingChange(building, checked)}
             >
@@ -144,7 +149,7 @@ class SelectAndSearch extends React.Component<SelectAndSearchProps, SelectAndSea
           {units.map((unit: string) => (
             <CheckableTag
               style={{ fontSize: 14 }}
-              key={'unit' + unit}
+              key={`unit${unit}`}
               checked={selectedUnit === unit}
               onChange={checked => this.handleUnitChange(unit, checked)}
             >

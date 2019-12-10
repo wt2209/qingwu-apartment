@@ -27,7 +27,7 @@ class Company extends React.Component<CompanyProps, CompanyState> {
             <p style={{ marginBottom: 0 }}>本房间入住日：{record.recordAt}</p>
             <p style={{ marginBottom: 0 }}>
               {record.rentStart ? (
-                '本房间租赁期：' + record.rentStart + ' — ' + record.rentEnd
+                `本房间租赁期：${record.rentStart} — ${record.rentEnd}`
               ) : (
                 <span>&nbsp;</span>
               )}
@@ -38,7 +38,7 @@ class Company extends React.Component<CompanyProps, CompanyState> {
         <div>
           <p style={{ marginBottom: 0 }}>
             {company.manager ? (
-              '负责人：' + company.manager + ' ' + company.managerPhone
+              `负责人：${company.manager} ${company.managerPhone}`
             ) : (
               <span>&nbsp;</span>
             )}

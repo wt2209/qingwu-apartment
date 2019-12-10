@@ -18,7 +18,7 @@ class Person extends React.Component<PersonProps, PersonState> {
         <div style={{ display: 'flex', alignItems: 'center', paddingBottom: 4 }}>
           <div style={{ flex: 2, fontSize: 16, fontWeight: 'bold' }}>
             {person.name}（{person.gender}
-            {person.education ? '，' + person.education : null}）
+            {person.education ? `，${person.education}` : null}）
           </div>
           <div style={{ flex: 1, fontSize: 14, fontWeight: 'bold', textAlign: 'right' }}>
             {record.category.title}

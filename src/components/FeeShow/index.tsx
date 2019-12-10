@@ -12,7 +12,7 @@ interface State {}
 class FeeShow extends React.Component<Props, State> {
   generateColumns = () => {
     // 第一列
-    let columns = [];
+    const columns = [];
     columns.push({
       title: '年度',
       dataIndex: 'year',
@@ -35,11 +35,11 @@ class FeeShow extends React.Component<Props, State> {
 
   generateData = () => {
     const { fees } = this.props;
-    const length = Object.values(fees)[0].length;
-    let data = [];
+    const { length } = Object.values(fees)[0];
+    const data = [];
 
     for (let i = 1; i < length; i++) {
-      let o = { year: '第' + i + '年' };
+      const o = { year: `第${i}年` };
       Object.keys(fees).forEach(key => {
         o[key] = fees[key][i];
       });
@@ -47,7 +47,7 @@ class FeeShow extends React.Component<Props, State> {
     }
 
     // 将 "其他年限" 放在最后
-    let last = { year: length > 0 ? '其他年' : '所有年' };
+    const last = { year: length > 0 ? '其他年' : '所有年' };
     Object.keys(fees).forEach(key => {
       last[key] = fees[key][0] || '不收费';
     });
@@ -63,7 +63,7 @@ class FeeShow extends React.Component<Props, State> {
     return (
       <Fragment>
         <Table
-          bordered={true}
+          bordered
           size="small"
           rowKey="year"
           columns={columns}

@@ -24,6 +24,7 @@ class FeeSetting extends React.Component<Props, State> {
       // 房租: [1000, 700, 800, 900],
     },
   };
+
   componentDidMount = () => {
     const { fees } = this.props;
 
@@ -32,25 +33,29 @@ class FeeSetting extends React.Component<Props, State> {
       totalYear: Object.values(fees)[0] ? Object.values(fees)[0].length - 1 : 0,
     });
   };
+
   deleteYear = (e: any) => {
     e.preventDefault();
-    this.setState({ totalYear: this.state.totalYear - 1 });
+    const totalYear = this.state.totalYear - 1;
+    this.setState({ totalYear });
   };
+
   deleteType = (e: any, key: string) => {
     e.preventDefault();
-    const fees = this.state.fees;
+    const { fees } = this.state;
     delete fees[key];
     this.setState({ fees });
   };
+
   addType = () => {
-    const fees = this.state.fees;
-    fees['费用类型' + (Object.keys(fees).length + 1)] = new Array(this.state.totalYear);
+    const { fees } = this.state;
+    fees[`费用类型${Object.keys(fees).length + 1}`] = new Array(this.state.totalYear);
     this.setState({ fees });
   };
+
   addYear = () => {
-    this.setState({
-      totalYear: this.state.totalYear + 1,
-    });
+    const totalYear = this.state.totalYear + 1;
+    this.setState({ totalYear });
   };
 
   submit = (callback: any) => {
@@ -62,8 +67,8 @@ class FeeSetting extends React.Component<Props, State> {
       this.setState({ error: '' });
       const { titles, values } = formValues;
 
-      let result = {};
-      values &&
+      const result = {};
+      if (values) {
         values.forEach((fees: number[], year: number) => {
           fees.forEach((fee: number, index: number) => {
             const type = titles[index];
@@ -73,6 +78,7 @@ class FeeSetting extends React.Component<Props, State> {
             result[type][year] = fee;
           });
         });
+      }
 
       if (callback) {
         callback(result);
@@ -83,7 +89,7 @@ class FeeSetting extends React.Component<Props, State> {
   generateColumns = () => {
     const { getFieldDecorator } = this.props.form;
     // 第一列
-    let columns = [];
+    const columns = [];
     columns.push({
       title: '',
       width: 80,
@@ -92,7 +98,7 @@ class FeeSetting extends React.Component<Props, State> {
     // 费用列
     Object.keys(this.state.fees).forEach((type, index) => {
       columns.push({
-        title: getFieldDecorator('titles[' + index + ']', {
+        title: getFieldDecorator(`titles[${index}]`, {
           initialValue: type,
           rules: [{ required: true, message: '必须填写' }],
         })(<Input key={type} />),
@@ -119,12 +125,12 @@ class FeeSetting extends React.Component<Props, State> {
   generateData = () => {
     const { getFieldDecorator } = this.props.form;
     const { fees } = this.state;
-    let data = [];
+    const data = [];
 
     for (let i = 1; i <= this.state.totalYear; i++) {
-      let o = { year: '第' + i + '年' };
+      const o = { year: `第${i}年` };
       Object.keys(fees).forEach((key, index) => {
-        o[key] = getFieldDecorator('values[' + i + '][' + index + ']', {
+        o[key] = getFieldDecorator(`values[${i}][${index}]`, {
           initialValue: fees[key][i],
           rules: [{ required: true, message: '必须填写' }],
         })(<Input style={{ maxWidth: 187 }} />);
@@ -133,9 +139,9 @@ class FeeSetting extends React.Component<Props, State> {
     }
 
     // 将 "其他年限" 放在最后
-    let last = { year: this.state.totalYear > 0 ? '其他年' : '所有年' };
+    const last = { year: this.state.totalYear > 0 ? '其他年' : '所有年' };
     Object.keys(fees).forEach((key, index) => {
-      last[key] = getFieldDecorator('values[0][' + index + ']', {
+      last[key] = getFieldDecorator(`values[0][${index}]`, {
         initialValue: fees[key][0],
         rules: [{ required: true, message: '必须填写' }],
       })(<Input placeholder="每月费用" style={{ maxWidth: 187 }} />);
@@ -170,7 +176,7 @@ class FeeSetting extends React.Component<Props, State> {
             title="不设置收费规则"
             subTitle={
               <div>
-                "若想为此类型设置收费规则，请点击 “添加一种费用” 按钮
+                若想为此类型设置收费规则，请点击 “添加一种费用” 按钮
                 <br />
                 若想为不同年限设置不同的月度费用，请点击 “添加年份” 按钮
               </div>

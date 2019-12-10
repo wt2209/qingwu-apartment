@@ -71,9 +71,7 @@ const CategoryModel: CategoryModelType = {
     },
     update(state, action) {
       const newList = state
-        ? state.data.list.map(item => {
-            return item.id === action.payload.id ? action.payload : item;
-          })
+        ? state.data.list.map(item => (item.id === action.payload.id ? action.payload : item))
         : [];
       return {
         data: {
