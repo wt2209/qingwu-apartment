@@ -8,3 +8,13 @@ export interface RoomListItem {
   remark: string; // 房间备注
   status?: 'show' | 'hide'; // 是否在主页面中显示
 }
+
+export interface RoomFormValueType {
+  id: number;
+  roomName: string;
+  building: string;
+  unit: string;
+  number: number | undefined;
+  rent: number | undefined;
+  remark: string;
+}

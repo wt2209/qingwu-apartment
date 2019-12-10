@@ -5,18 +5,18 @@ import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
 import { ModelState } from './model';
 import { connect } from 'dva';
-import CreateForm from './components/CreateForm';
+import CreateOrUpdateForm from './components/CreateOrUpdateForm';
 import styles from '../../styles/index.less';
-import { RoomListItem } from '@/dataTypes/listItem';
-import { RoomFetchParams, RoomStoreData } from '@/services/room';
+import { RoomFetchParams } from '@/services/room';
 import { removeEmpty } from '@/utils/tools';
+import { RoomListItem, RoomFormValueType } from './data';
 
 const FormItem = Form.Item;
 
 export interface State {
-  createModelVisible: boolean;
-  updateModelVisible: boolean;
+  modalVisible: boolean;
   params: RoomFetchParams;
+  currentRoom: RoomFormValueType;
 }
 
 export interface Props extends FormComponentProps {
@@ -44,26 +44,55 @@ export interface Props extends FormComponentProps {
 class Room extends React.Component<Props, State> {
   state: State = {
     params: { current: 1, pageSize: 20 },
-    createModelVisible: false,
-    updateModelVisible: false,
+    modalVisible: false,
+    currentRoom: {
+      id: 0,
+      roomName: '',
+      building: '',
+      unit: '',
+      number: undefined,
+      rent: undefined,
+      remark: '',
+    },
   };
   componentDidMount = () => {
     this.fetchData(this.state.params);
   };
-  handleCreateModalVisible = (flag: boolean) => {
+  handleModalVisible = (flag: boolean) => {
+    this.setState({ modalVisible: flag });
+  };
+  handleAdd = () => {
     this.setState({
-      createModelVisible: flag,
+      currentRoom: {
+        id: 0,
+        roomName: '',
+        building: '',
+        unit: '',
+        number: undefined,
+        rent: undefined,
+        remark: '',
+      },
+      modalVisible: true,
     });
   };
-  handleAdd = (payload: Partial<RoomStoreData>) => {
+  handleEdit = (record: RoomFormValueType) => {
+    this.setState({
+      currentRoom: record,
+      modalVisible: true,
+    });
+  };
+  handleSubmit = (payload: RoomFormValueType) => {
+    const type = payload.id > 0 ? 'rooms/update' : 'rooms/add';
     this.props.dispatch({
-      type: 'rooms/add',
+      type,
       payload,
       callback: (status: 'ok' | 'error') => {
-        status === 'ok' ? message.success('添加成功') : message.error('添加失败');
+        status === 'ok' ? message.success('操作成功') : message.error('操作失败');
       },
     });
-    this.handleCreateModalVisible(false);
+    this.setState({
+      modalVisible: false,
+    });
   };
   handlePaginationChange = (current: number) => {
     const payload = { ...this.state.params, current };
@@ -181,7 +210,7 @@ class Room extends React.Component<Props, State> {
         title: '操作',
         render: (text: string, record: RoomListItem) => (
           <Fragment>
-            <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
+            <a onClick={() => this.handleEdit(record)}>修改</a>
             <Divider type="vertical" />
             {record.status === 'hide' && (
               <a onClick={() => this.handleChangeStatus('show', record.id)}>显示</a>
@@ -199,14 +228,10 @@ class Room extends React.Component<Props, State> {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button
-                icon="plus"
-                type="primary"
-                onClick={() => this.handleCreateModalVisible(true)}
-              >
+              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
               </Button>
-              <Button icon="download" onClick={() => this.handleCreateModalVisible(true)}>
+              <Button icon="download" onClick={() => this.handleModalVisible(true)}>
                 导出
               </Button>
             </div>
@@ -219,10 +244,11 @@ class Room extends React.Component<Props, State> {
             />
           </div>
         </Card>
-        <CreateForm
-          handleAdd={this.handleAdd}
-          handleModelVisible={this.handleCreateModalVisible}
-          modelVisible={this.state.createModelVisible}
+        <CreateOrUpdateForm
+          defaultValue={this.state.currentRoom}
+          handleSubmit={this.handleSubmit}
+          handleModalVisible={this.handleModalVisible}
+          modelVisible={this.state.modalVisible}
         />
       </PageHeaderWrapper>
     );
