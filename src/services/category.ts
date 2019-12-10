@@ -12,6 +12,7 @@ export async function query(params: CategoryFetchParams): Promise<any> {
 }
 
 export interface CategoryStoreData {
+  id: number;
   title: string;
   type: 'person' | 'company' | 'functional';
   utilityType: string;
@@ -21,6 +22,13 @@ export interface CategoryStoreData {
 export async function store(data: CategoryStoreData): Promise<any> {
   return request.post('/api/categories', {
     method: 'post',
+    data,
+  });
+}
+
+export async function update(data: CategoryStoreData): Promise<any> {
+  return request.post('/api/categories', {
+    method: 'put',
     data,
   });
 }

@@ -1,22 +1,25 @@
 import { Modal, Form, Steps, Button, Radio, Input } from 'antd';
 import React from 'react';
 import { FormComponentProps } from 'antd/es/form';
-import { ChargeRule } from '@/models/common';
 import FeeSetting from '@/components/FeeSetting';
 import { CategoryStoreData } from '@/services/category';
 import { CategoryTypeMapper } from '@/mappers';
 
-interface FormValueType {
+export interface FormValueType {
+  id: number;
   title: string;
   type: 'person' | 'company' | 'functional';
   utilityType: string;
-  chargeRules: ChargeRule[];
-  remark: '';
+  chargeRules: {
+    [key: string]: number[];
+  };
+  remark: string;
 }
 interface Props extends FormComponentProps {
   modelVisible: boolean;
-  handleAdd: (values: CategoryStoreData) => void;
-  handleModalVisible: (flag: boolean) => void;
+  defaultValues: FormValueType;
+  handleSubmit: (values: CategoryStoreData) => void;
+  handleModalHide: () => void;
 }
 interface State {
   formValues: FormValueType;
@@ -28,14 +31,15 @@ const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
 
-class CreateForm extends React.Component<Props, State> {
+class CreateOrUpdateForm extends React.Component<Props, State> {
   feeFormRef = { submit: (result: any) => {} };
   state: State = {
     formValues: {
+      id: 0,
       title: '',
       type: 'person',
       utilityType: '',
-      chargeRules: [],
+      chargeRules: {},
       remark: '',
     },
     currentStep: 0,
@@ -44,6 +48,13 @@ class CreateForm extends React.Component<Props, State> {
   formLayout = {
     labelCol: { span: 7 },
     wrapperCol: { span: 13 },
+  };
+
+  componentDidMount = () => {
+    this.setState({
+      currentStep: 0,
+      formValues: this.props.defaultValues,
+    });
   };
 
   handleNext = (currentStep: number) => {
@@ -69,20 +80,37 @@ class CreateForm extends React.Component<Props, State> {
     this.feeFormRef.submit((result: any) => {
       const values = {
         ...this.state.formValues,
+        id: this.props.defaultValues.id,
         chargeRules: result,
       };
       this.setState({
         formValues: {
+          id: 0,
           title: '',
           type: 'person',
           utilityType: '',
-          chargeRules: [],
+          chargeRules: {},
           remark: '',
         },
         currentStep: 0,
       });
-      this.props.handleAdd(values);
+      this.props.handleSubmit(values);
     });
+  };
+
+  handleModalHide = () => {
+    this.setState({
+      formValues: {
+        id: 0,
+        title: '',
+        type: 'person',
+        utilityType: '',
+        chargeRules: {},
+        remark: '',
+      },
+      currentStep: 0,
+    });
+    this.props.handleModalHide();
   };
 
   backward = () => {
@@ -103,7 +131,11 @@ class CreateForm extends React.Component<Props, State> {
     const { form } = this.props;
     if (currentStep === 1) {
       return [
-        <FeeSetting key="feeForm" wrappedComponentRef={(form: any) => (this.feeFormRef = form)} />,
+        <FeeSetting
+          fees={formVals.chargeRules}
+          key="feeForm"
+          wrappedComponentRef={(form: any) => (this.feeFormRef = form)}
+        />,
       ];
     }
 
@@ -142,7 +174,6 @@ class CreateForm extends React.Component<Props, State> {
   };
 
   renderFooter = (currentStep: number) => {
-    const { handleModalVisible } = this.props;
     if (currentStep === 1) {
       return [
         <Button key="back" onClick={this.backward}>
@@ -154,7 +185,7 @@ class CreateForm extends React.Component<Props, State> {
       ];
     }
     return [
-      <Button key="cancel" onClick={() => handleModalVisible(false)}>
+      <Button key="cancel" onClick={this.handleModalHide}>
         取消
       </Button>,
       <Button key="forward" type="primary" onClick={() => this.handleNext(currentStep)}>
@@ -164,8 +195,8 @@ class CreateForm extends React.Component<Props, State> {
   };
 
   render() {
-    const { modelVisible, handleModalVisible } = this.props;
-    const { currentStep, formValues } = this.state;
+    const { modelVisible, defaultValues } = this.props;
+    const { currentStep } = this.state;
     return (
       <Modal
         width={800}
@@ -174,18 +205,18 @@ class CreateForm extends React.Component<Props, State> {
         title="规则配置"
         visible={modelVisible}
         footer={this.renderFooter(currentStep)}
-        onCancel={() => handleModalVisible(false)}
-        afterClose={() => handleModalVisible(false)}
+        onCancel={this.handleModalHide}
+        afterClose={this.handleModalHide}
       >
         <Steps style={{ marginBottom: 28 }} size="small" current={currentStep}>
           <Step title="基本信息" />
           <Step title="设置收费规则" />
           <Step title="完成" />
         </Steps>
-        {this.renderContent(currentStep, formValues)}
+        {this.renderContent(currentStep, defaultValues)}
       </Modal>
     );
   }
 }
 
-export default Form.create<Props>()(CreateForm);
+export default Form.create<Props>()(CreateOrUpdateForm);

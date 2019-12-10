@@ -1,6 +1,6 @@
 import { ResponseListType } from '@/models/common';
-import { CategoryListItem } from '@/dataTypes/listItem';
 import { Request, Response } from 'express';
+import { CategoryListItem } from '@/pages/categories/data';
 
 let categories: ResponseListType<CategoryListItem> = {
   status: 'ok',
@@ -79,6 +79,17 @@ export default {
 
   'POST /api/categories': (req: Request, res: Response) => {
     const body = { ...req.body, id: 1001 };
+
+    setTimeout(() => {
+      res.status(200).send({
+        status: 'ok',
+        data: body,
+      });
+    }, 1000);
+  },
+
+  'PUT /api/categories': (req: Request, res: Response) => {
+    const body = { ...req.body };
 
     setTimeout(() => {
       res.status(200).send({

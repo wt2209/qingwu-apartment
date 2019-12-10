@@ -2,7 +2,11 @@ import React, { Fragment } from 'react';
 import { Table, Input, Button, Form, Alert, Result } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 
-interface Props extends FormComponentProps {}
+interface Props extends FormComponentProps {
+  fees: {
+    [key: string]: number[];
+  };
+}
 
 interface State {
   error: string;
@@ -19,6 +23,14 @@ class FeeSetting extends React.Component<Props, State> {
     fees: {
       // 房租: [1000, 700, 800, 900],
     },
+  };
+  componentDidMount = () => {
+    const { fees } = this.props;
+
+    this.setState({
+      fees,
+      totalYear: Object.values(fees)[0] ? Object.values(fees)[0].length - 1 : 0,
+    });
   };
   deleteYear = (e: any) => {
     e.preventDefault();

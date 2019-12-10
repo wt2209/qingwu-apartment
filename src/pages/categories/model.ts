@@ -1,7 +1,7 @@
 import { Reducer } from 'redux';
 import { Effect } from 'dva';
 import { ListData } from '@/models/common';
-import { query, store } from '@/services/category';
+import { query, store, update } from '@/services/category';
 import { CategoryListItem } from './data';
 
 export interface CategoryModelType {
@@ -15,6 +15,7 @@ export interface CategoryModelType {
   };
   reducers: {
     save: Reducer<CategoryModelState>;
+    update: Reducer<CategoryModelState>;
     append: Reducer<CategoryModelState>;
   };
 }
@@ -37,6 +38,9 @@ const CategoryModel: CategoryModelType = {
       yield put({ type: 'save', payload: response.data });
     },
     *add({ payload, callback }, { call, put }) {
+      if (payload.id) {
+        delete payload.id;
+      }
       const response = yield call(store, payload);
       yield put({
         type: 'append',
@@ -47,13 +51,35 @@ const CategoryModel: CategoryModelType = {
       }
     },
     *remove({ payload, callback }, { call, put }) {},
-    *update({ payload, callback }, { call, put }) {},
+    *update({ payload, callback }, { call, put }) {
+      const response = yield call(update, payload);
+      yield put({
+        type: 'update',
+        payload: response.data,
+      });
+      if (callback) {
+        callback(response.status);
+      }
+    },
   },
   reducers: {
     save(state, action) {
       return {
         ...state,
         data: action.payload,
+      };
+    },
+    update(state, action) {
+      const newList = state
+        ? state.data.list.map(item => {
+            return item.id === action.payload.id ? action.payload : item;
+          })
+        : [];
+      return {
+        data: {
+          list: newList,
+          pagination: state ? state.data.pagination : {},
+        },
       };
     },
     append(state, action) {

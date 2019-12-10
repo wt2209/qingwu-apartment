@@ -5,18 +5,18 @@ import { FormComponentProps } from 'antd/es/form';
 import { Dispatch, Action } from 'redux';
 import { CategoryModelState } from './model';
 import { connect } from 'dva';
-import CreateForm from './components/CreateForm';
 import styles from '../../styles/index.less';
 import { removeEmpty } from '@/utils/tools';
 import { CategoryFetchParams, CategoryStoreData } from '@/services/category';
 import FeeShow from '@/components/FeeShow';
 import { CategoryTypeMapper } from '@/mappers';
 import { CategoryListItem } from './data';
+import CreateOrUpdateForm, { FormValueType } from './components/CreateOrUpdateForm';
 
 export interface CategoryState {
   params: CategoryFetchParams;
-  createModalVisible: boolean;
-  updateModalVisible: boolean;
+  modalVisible: boolean;
+  currentItem: FormValueType;
 }
 
 export interface CategoryProps extends FormComponentProps {
@@ -46,27 +46,53 @@ export interface CategoryProps extends FormComponentProps {
 class Category extends React.Component<CategoryProps, CategoryState> {
   state: CategoryState = {
     params: { current: 1, pageSize: 20 },
-    createModalVisible: false,
-    updateModalVisible: false,
+    modalVisible: false,
+    currentItem: {
+      id: 0,
+      title: '',
+      type: 'person',
+      utilityType: '',
+      chargeRules: {},
+      remark: '',
+    },
   };
   componentDidMount = () => {
     this.fetchData(this.state.params);
   };
-  handleCreateModalVisible = (flag: boolean) => {
+  handleAdd = () => {
     this.setState({
-      createModalVisible: flag,
-    });
-  };
-  handleAdd = (payload: CategoryStoreData) => {
-    this.setState({ createModalVisible: false });
-    this.props.dispatch({
-      type: 'categories/add',
-      payload,
-      callback: (status: 'ok' | 'error') => {
-        status === 'ok' ? message.success('添加成功') : message.error('添加失败');
+      modalVisible: true,
+      currentItem: {
+        id: 0,
+        title: '',
+        type: 'person',
+        utilityType: '',
+        chargeRules: {},
+        remark: '',
       },
     });
   };
+  handleEdit = (record: FormValueType) => {
+    this.setState({
+      modalVisible: true,
+      currentItem: record,
+    });
+  };
+  handleModalHide = () => {
+    this.setState({ modalVisible: false });
+  };
+  handleSubmit = (payload: CategoryStoreData) => {
+    this.setState({ modalVisible: false });
+    const type = payload.id > 0 ? 'categories/update' : 'categories/add';
+    this.props.dispatch({
+      type,
+      payload,
+      callback: (status: 'ok' | 'error') => {
+        status === 'ok' ? message.success('操作成功') : message.error('操作失败');
+      },
+    });
+  };
+
   handlePaginationChange = (current: number, pageSize: number = 20) => {
     const payload = { current, pageSize };
     this.fetchData(payload);
@@ -75,6 +101,9 @@ class Category extends React.Component<CategoryProps, CategoryState> {
   // 控制此类型是否在居住首页楼号选择中显示
   handleChangeStatus = (status: 'show' | 'hide', id: number) => {
     console.log(id);
+  };
+  handleExport = () => {
+    console.log('export');
   };
   expandedRowRender = (record: CategoryListItem) => {
     return Object.values(record.chargeRules).length > 0 ? (
@@ -130,7 +159,7 @@ class Category extends React.Component<CategoryProps, CategoryState> {
         title: '操作',
         render: (text: string, record: CategoryListItem) => (
           <Fragment>
-            <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
+            <a onClick={() => this.handleEdit(record)}>修改</a>
             <Divider type="vertical" />
             {record.status === 'hide' && (
               <a onClick={() => this.handleChangeStatus('show', record.id)}>显示</a>
@@ -147,14 +176,10 @@ class Category extends React.Component<CategoryProps, CategoryState> {
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListOperator}>
-              <Button
-                icon="plus"
-                type="primary"
-                onClick={() => this.handleCreateModalVisible(true)}
-              >
+              <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
               </Button>
-              <Button icon="download" onClick={() => this.handleCreateModalVisible(true)}>
+              <Button icon="download" onClick={() => this.handleExport()}>
                 导出
               </Button>
             </div>
@@ -168,10 +193,11 @@ class Category extends React.Component<CategoryProps, CategoryState> {
             />
           </div>
         </Card>
-        <CreateForm
-          handleAdd={this.handleAdd}
-          handleModalVisible={this.handleCreateModalVisible}
-          modelVisible={this.state.createModalVisible}
+        <CreateOrUpdateForm
+          defaultValues={this.state.currentItem}
+          handleSubmit={this.handleSubmit}
+          handleModalHide={this.handleModalHide}
+          modelVisible={this.state.modalVisible}
         />
       </PageHeaderWrapper>
     );
