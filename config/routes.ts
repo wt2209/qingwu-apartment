@@ -61,7 +61,6 @@ export default [
             path: '/list/table-list',
             component: './list/table-list',
           },
-
           {
             name: '居住管理',
             icon: 'home',
@@ -71,35 +70,40 @@ export default [
                 name: '居住',
                 icon: 'info-circle',
                 path: '/living/index',
-                component: './livings',
+                component: './living/livings',
               },
               {
                 name: '类型',
                 icon: 'info-circle',
                 path: '/living/categories',
-                component: './categories',
+                component: './living/categories',
               },
               {
                 name: '房间',
                 icon: 'info-circle',
                 path: '/living/rooms',
-                component: './rooms',
+                component: './living/rooms',
               },
               {
                 name: '人员',
                 icon: 'info-circle',
                 path: '/living/people',
-                component: './people',
+                component: './living/people',
               },
               {
                 name: '公司',
                 icon: 'info-circle',
                 path: '/living/companies',
-                component: './companies',
+                component: './living/companies',
               },
             ],
           },
-
+          {
+            name: '费用',
+            icon: 'smile',
+            path: '/bill/index',
+            component: './bill/bills',
+          },
           {
             component: './404',
           },
