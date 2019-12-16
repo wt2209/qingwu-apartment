@@ -99,10 +99,17 @@ export default [
             ],
           },
           {
-            name: '费用',
-            icon: 'smile',
-            path: '/bill/index',
-            component: './bill/bills',
+            name: '费用管理',
+            icon: 'pay-circle',
+            path: '/bill',
+            routes: [
+              {
+                name: '明细',
+                icon: 'info-circle',
+                path: '/bill/bills',
+                component: './bill/bills',
+              },
+            ],
           },
           {
             component: './404',

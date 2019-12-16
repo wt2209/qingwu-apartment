@@ -1,38 +1,14 @@
 import request from '@/utils/request';
-import { TableListParams } from './data';
 
-export async function queryRule(params?: TableListParams) {
-  return request('/api/rule', {
+export interface BillFetchParams {
+  current: number;
+  pageSize: number;
+}
+export async function query(params: BillFetchParams): Promise<any> {
+  return request('/api/bills', {
     params,
   });
 }
 
-export async function removeRule(params: { key: number[] }) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'delete',
-    },
-  });
-}
-
-export async function addRule(params: TableListParams) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'post',
-    },
-  });
-}
-
-export async function updateRule(params: TableListParams) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'update',
-    },
-  });
-}
+export async function store(): Promise<any> {}
+export async function update(): Promise<any> {}
