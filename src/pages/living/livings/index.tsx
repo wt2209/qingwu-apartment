@@ -13,6 +13,7 @@ import { removeEmpty } from '@/utils/tools';
 import Functional from './components/Functional';
 import { LivingListItem } from './data';
 import { RecordListItem } from '../records/data';
+import { Link } from 'umi';
 
 export interface Props extends FormComponentProps {
   dispatch: Dispatch<Action<'livings/add' | 'livings/fetch' | 'livings/remove' | 'livings/update'>>;
@@ -72,7 +73,9 @@ class Living extends React.Component<Props, State> {
               type="dashed"
               style={{ border: '0', backgroundColor: '#5dade2', width: '100%', height: 225 }}
             >
-              <Icon type="plus" style={{ fontSize: 30, color: 'rgba(0,0,0,0.65)' }} />
+              <Link to={`/living/livings/create/${living.id}`}>
+                <Icon type="plus" style={{ fontSize: 30, color: 'rgba(0,0,0,0.65)' }} />
+              </Link>
             </Button>
           </Card.Grid>,
         );

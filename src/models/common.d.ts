@@ -17,10 +17,10 @@ export interface ResponseListType<T> {
 }
 
 // 后端返回的单个结果
-export interface ResponseItemType {
+export interface ResponseItemType<T> {
   status: 'ok' | 'error';
   errMsg?: string;
-  data?: Object;
+  data?: T;
 }
 
 export interface Pagination {

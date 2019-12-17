@@ -69,7 +69,7 @@ export default [
               {
                 name: '居住',
                 icon: 'info-circle',
-                path: '/living/index',
+                path: '/living/livings',
                 component: './living/livings',
               },
               {
@@ -96,6 +96,12 @@ export default [
                 path: '/living/companies',
                 component: './living/companies',
               },
+              {
+                name: '入住',
+                path: '/living/livings/create/:roomId',
+                hideInMenu: true,
+                component: './living/livingsCreate',
+              },
             ],
           },
           {
@@ -110,6 +116,12 @@ export default [
                 component: './bill/bills',
               },
             ],
+          },
+          {
+            name: '分步表单',
+            icon: 'smile',
+            path: '/formstepform',
+            component: './FormStepForm',
           },
           {
             component: './404',

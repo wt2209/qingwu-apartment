@@ -175,7 +175,7 @@ class Category extends React.Component<CategoryProps, CategoryState> {
       <PageHeaderWrapper title={false}>
         <Card bordered={false} bodyStyle={{ padding: 0 }}>
           <div className={styles.tableListHeader}>
-            <div className={styles.tableListTitle}>房间明细</div>
+            <div className={styles.tableListTitle}>类型明细</div>
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                 新建
