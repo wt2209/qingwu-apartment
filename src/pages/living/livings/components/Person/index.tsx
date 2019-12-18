@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card, Divider, Tag } from 'antd';
-import { RecordListItem } from '@/pages/records/data';
+import { RecordListItem } from '@/pages/living/records/data';
 
-export interface PersonState {}
+export interface PersonState { }
 export interface PersonProps {
   record: RecordListItem;
 }
@@ -39,13 +39,13 @@ function Person(props: PersonProps) {
         {person.contractStart && (
           <p style={{ marginBottom: 0 }}>
             劳动合同：
-            {person.contractStart} — {person.contractEnd}
+            {person.contractStart}~{person.contractEnd}
           </p>
         )}
         {record.rentStart && (
           <p style={{ marginBottom: 0 }}>
             租赁期限：
-            {record.rentStart} — {record.rentEnd}
+            {record.rentStart}~{record.rentEnd}
           </p>
         )}
       </div>

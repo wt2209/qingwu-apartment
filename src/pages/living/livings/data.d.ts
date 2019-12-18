@@ -10,3 +10,8 @@ export interface LivingListItem {
   remark: string; // 房间备注
   records: RecordListItem[];
 }
+
+export interface BuildingTreeItem {
+  building: string;
+  units: string[];
+}
