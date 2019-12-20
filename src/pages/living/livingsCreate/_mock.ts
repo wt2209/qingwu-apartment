@@ -20,6 +20,15 @@ const options: ResponseItemType<OptionsType> = {
       { id: 5, companyName: '公司噶士大夫就5' },
       { id: 6, companyName: '公司噶士大夫就6' },
     ],
+    feeTypes: [
+      { id: 1, title: '租赁房租' },
+      { id: 2, title: '租赁物业费' },
+      { id: 3, title: '租赁电梯费' },
+      { id: 4, title: '单身床位费' },
+      { id: 5, title: '单身电费' },
+      { id: 6, title: '租赁电费' },
+      { id: 7, title: '租赁水费' },
+    ],
   },
 };
 

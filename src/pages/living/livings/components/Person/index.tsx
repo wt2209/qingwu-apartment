@@ -52,7 +52,7 @@ function Person(props: PersonProps) {
       <Divider style={{ margin: 2, backgroundColor: '#7ec4e6' }} />
       <div>
         <p style={{ marginBottom: 0 }}>
-          身份证号：
+          身份证：
           {person.identify}
         </p>
         <p style={{ marginBottom: 0 }}>

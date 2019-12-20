@@ -5,6 +5,7 @@ import { query, queryOptions } from './service';
 export interface OptionsType {
   categories: Array<{ id: number; title: string; type: string }>;
   companies: Array<{ id: number; companyName: string }>;
+  feeTypes: Array<{ id: number; title: string }>;
 }
 
 export interface ModelState {
@@ -28,6 +29,7 @@ const Model: ModelType = {
     options: {
       categories: [],
       companies: [],
+      feeTypes: [],
     },
   },
   effects: {

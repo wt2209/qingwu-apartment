@@ -6,7 +6,9 @@ export interface ListData<T> {
 
 // 缴费规则
 export interface ChargeRule {
-  [key: string]: number[];
+  title: string;
+  costs: number[];
+  lateRate: number;
 }
 
 // 后端返回的数组结果

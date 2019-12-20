@@ -198,9 +198,16 @@ class Living extends React.Component<Props, State> {
 
     return (
       <PageHeaderWrapper title={false}>
+        <div>
+          <Spin spinning={loading || false}>
+            <Card style={{ marginBottom: 20 }}>
+              <SearchBar fetchData={this.fetchData} params={params} />
+            </Card>
+          </Spin>
+        </div>
         <div style={{ display: 'flex' }}>
-          <div style={{ width: 168, marginRight: 16 }} >
-            <Card bodyStyle={{ padding: 16 }}>
+          <div style={{ width: 148, marginRight: 16 }} >
+            <Card bodyStyle={{ padding: 6}}>
               <Spin spinning={loading || false}>
                 <DirectoryTree expandedKeys={expandedKeys} checkedKeys={checkedKeys} onSelect={this.onSelect}>
                   {buildingTree.map(item =>
@@ -213,14 +220,10 @@ class Living extends React.Component<Props, State> {
             </Card>
           </div>
           <div style={{ flex: 1 }}>
-            <Spin spinning={loading || false}>
-              <Card style={{ marginBottom: 20 }}>
-                <SearchBar fetchData={this.fetchData} params={params} />
-              </Card>
-            </Spin>
+            
             <Row gutter={24}>
               {list.map(living => (
-                <Col span={12} key={living.id}>
+                <Col md={12} sm={24} key={living.id}>
                   <Card
                     style={{ marginBottom: 24 }}
                     headStyle={{ padding: '0 12px' }}

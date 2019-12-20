@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Form, Select, Input, Button, Radio, DatePicker } from 'antd';
+import { Form, Select, Input, Button, Radio, DatePicker, Checkbox } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import styles from '../../style.less';
 import { OptionsType } from '../../model';
@@ -11,8 +11,10 @@ const itemLayout = {
 
 interface Props extends FormComponentProps {
   options: OptionsType;
+  onSubmit: (values:Object)=>void
 }
 interface State {
+  isUnfixedContract: boolean; // 是否是无固定期合同
   type: 'person' | 'company' | 'functional' | null;
   filteredCompanies: Array<{ id: number; companyName: string }>;
   filteredCategories: Array<{ id: number; title: string; type: string }>;
@@ -20,16 +22,48 @@ interface State {
 
 class Step1 extends React.Component<Props, State> {
   state: State = {
+    isUnfixedContract: false,
     type: 'person',
     filteredCategories: [],
     filteredCompanies: [],
+  };
+
+  handleSubmit = (e: any) => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        const { rentPeriod, ...rest } = values;
+        const result = { ...rest };
+        if (rentPeriod) {
+          result.rentStart = rentPeriod[0].format('YYYY-MM-DD');
+          result.rentEnd = rentPeriod[1].format('YYYY-MM-DD');
+        }
+        if (this.state.isUnfixedContract && result.contractStart) {
+          // 是无固定期劳动合同
+          result.contractStart = result.contractStart.format('YYYY-MM-DD');
+          result.contractEnd = '无固定期';
+        } else {
+          if (result.contractPeriod) {
+            result.contractStart = result.contractPeriod[0].format('YYYY-MM-DD');
+            result.contractEnd = result.contractPeriod[1].format('YYYY-MM-DD');
+          }
+          delete result.contractPeriod;
+        }
+        this.props.onSubmit(result)
+      }
+    });
   };
 
   handleTypeChange = (e: any) => {
     const type = e.target.value;
     const { categories } = this.props.options;
     const filteredCategories = categories.filter(c => c.type === type);
+    this.props.form.resetFields();
     this.setState({ filteredCategories, type });
+  };
+
+  handleUnfixedContractChange = (event: any) => {
+    this.setState({ isUnfixedContract: event.target.checked });
   };
 
   componentDidMount = () => {
@@ -42,11 +76,16 @@ class Step1 extends React.Component<Props, State> {
 
   render() {
     const { filteredCategories, type } = this.state;
-
     const { getFieldDecorator } = this.props.form;
+
     return (
       <Fragment>
-        <Form layout="horizontal" className={styles.stepForm}>
+        <Form
+          layout="horizontal"
+          hideRequiredMark
+          className={styles.stepForm}
+          onSubmit={e => this.handleSubmit(e)}
+        >
           <Form.Item {...itemLayout} label="属于">
             {getFieldDecorator('type', {
               initialValue: type,
@@ -79,7 +118,7 @@ class Step1 extends React.Component<Props, State> {
             <Fragment>
               <Form.Item {...itemLayout} label="身份证号">
                 {getFieldDecorator('identify', {
-                  rules: [{ required: true, message: '必须输入' }],
+                  rules: [{ len: 18, message: '身份证号必须是18位' }],
                 })(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="姓名">
@@ -129,10 +168,23 @@ class Step1 extends React.Component<Props, State> {
                 {getFieldDecorator('enteredAt')(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="劳动合同">
-                {getFieldDecorator('contractStart')(<DatePicker.RangePicker format="YYYY-MM-DD" />)}
+                {this.state.isUnfixedContract
+                  ? getFieldDecorator('contractStart')(
+                      <DatePicker placeholder="开始日期" format="YYYY-MM-DD" />,
+                    )
+                  : getFieldDecorator('contractPeriod')(
+                      <DatePicker.RangePicker format="YYYY-MM-DD" />,
+                    )}
+                <Checkbox
+                  style={{ float: 'right' }}
+                  defaultChecked={this.state.isUnfixedContract}
+                  onChange={event => this.handleUnfixedContractChange(event)}
+                >
+                  无固定期
+                </Checkbox>
               </Form.Item>
               <Form.Item {...itemLayout} label="租期">
-                {getFieldDecorator('contractEnd')(<DatePicker.RangePicker format="YYYY-MM-DD" />)}
+                {getFieldDecorator('rentPeriod')(<DatePicker.RangePicker format="YYYY-MM-DD" />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="籍贯">
                 {getFieldDecorator('origin')(<Input />)}
@@ -198,7 +250,9 @@ class Step1 extends React.Component<Props, State> {
             }}
             label=""
           >
-            <Button type="primary">下一步</Button>
+            <Button type="primary" htmlType="submit">
+              下一步
+            </Button>
           </Form.Item>
         </Form>
       </Fragment>
