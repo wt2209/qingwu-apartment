@@ -53,7 +53,7 @@ class LivingCreate extends React.Component<Props, State> {
     chargeRules: [
       {
         title: '租赁房租',
-        costs: [900, 600, 700, 800],
+        costs: [600, 700, 800, 900],
         lateRate: 3,
       },
     ],
@@ -91,7 +91,7 @@ class LivingCreate extends React.Component<Props, State> {
         data={this.state.chargeRules}
         prevStep={this.prevStep}
       />,
-      <Step2 />,
+      <Step1 onSubmit={this.handleBasicInfoSubmit} options={this.props.options} />,
     ];
 
     return (

@@ -8,3 +8,7 @@ export function removeEmpty(params: Object) {
   });
   return result;
 }
+
+export function isNumber(value: number| string) {
+  return !isNaN(+value);
+}

@@ -4,19 +4,7 @@ import { FormComponentProps } from 'antd/es/form';
 import styles from '../../style.less';
 import { ChargeRule } from '@/models/common';
 import { OptionsType } from '../../model';
-
-const fees = [
-  {
-    title: '租赁房租',
-    costs: [900, 600, 700, 800],
-    lateRate: 3, // 滞纳金（以百分比计）
-  },
-  {
-    title: '租赁物业费',
-    costs: [98],
-    lateRate: 0,
-  },
-];
+import { isNumber } from '@/utils/tools';
 
 const itemLayout = {
   labelCol: { span: 8 },
@@ -33,6 +21,7 @@ interface Props extends FormComponentProps {
 interface State {
   newTitle: string;
   data: ChargeRule[];
+  errors: Array<'error' | 'success'>; // 标明哪个数据有错误
   addModalVisible: boolean;
 }
 
@@ -40,6 +29,7 @@ class Step2 extends React.Component<Props, State> {
   state: State = {
     newTitle: '',
     data: [],
+    errors: [],
     addModalVisible: false,
   };
 
@@ -47,15 +37,22 @@ class Step2 extends React.Component<Props, State> {
     this.setState({ data: this.props.data });
   };
 
-  handleSubmit=(e:any)=>{
+  handleSubmit = (e: any) => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        console.log(values)
-        // this.props.onSubmit(result);
-      }
+    if (this.state.errors.some(v => v === 'error')) {
+      return;
+    }
+    let { data } = this.state;
+    // 去除费用中的空值
+    data = data.map(d => {
+      d.costs = d.costs.filter(c => c);
+      return d;
     });
-  }
+    // 去除没有费用的项目
+    data = data.filter(d => d.costs.length > 0);
+
+    this.props.onSubmit(data)
+  };
 
   handleAddNewFee = () => {
     const { newTitle } = this.state;
@@ -79,33 +76,39 @@ class Step2 extends React.Component<Props, State> {
 
   handleCostsChange = (e: any, index: number) => {
     const values = e.target.value.split('\n');
-
-    let lastRow = values[values.length - 1];
     const data = [...this.state.data];
-    data[index].costs = [lastRow, ...values.slice(0, -1)];
+    let errors = this.state.errors;
+    errors[index] = values.some((v: string) => !isNumber(v)) ? 'error' : 'success';
+    data[index].costs = values;
+    this.setState({ data, errors });
+  };
 
-    console.log(data[index].costs);
-    this.setState({ data });
+  handleRateChange = (e: any, index: number) => {
+    console.log(e);
   };
 
   handleModalVisible = (flag: boolean) => {
     this.setState({ addModalVisible: flag });
   };
 
+  handleDelete = (index: number) => {
+    const data = this.state.data.filter((d, i) => i !== index);
+    this.setState({ data });
+  };
+
   renderCostsShow = (values: number[]) => {
     let str = '';
-    for (let i = 1; i < values.length; i++) {
+    for (let i = 0; i < values.length; i++) {
       str += values[i] + '\n';
     }
-    str += values[0];
     return str;
   };
 
-  renderTitle = (title: string) => {
+  renderTitle = (title: string, index: number) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span>{title}</span>
-        <Button type="link" style={{ height: 24 }}>
+        <Button type="link" onClick={() => this.handleDelete(index)} style={{ height: 24 }}>
           删除
         </Button>
       </div>
@@ -113,7 +116,7 @@ class Step2 extends React.Component<Props, State> {
   };
 
   render() {
-    const { data, newTitle } = this.state;
+    const { data, newTitle, errors } = this.state;
     const {
       prevStep,
       options: { feeTypes },
@@ -140,20 +143,30 @@ class Step2 extends React.Component<Props, State> {
                 <Col key={index} span={12}>
                   <Card
                     key={index}
-                    title={this.renderTitle(fee.title)}
+                    title={this.renderTitle(fee.title, index)}
                     size="small"
                     style={{ marginBottom: 16 }}
                   >
-                    <Form.Item label="费用" {...itemLayout}>
+                    <Form.Item
+                      validateStatus={errors[index] === 'error' ? 'error' : 'success'}
+                      label="费用"
+                      {...itemLayout}
+                    >
                       <Input.TextArea
-                        value={this.renderCostsShow(fee.costs)}
+                        value={fee.costs.join('\n')}
                         onChange={e => this.handleCostsChange(e, index)}
                         rows={5}
                         placeholder="一年的费用写一行"
                       />
                     </Form.Item>
                     <Form.Item label="每日滞纳金" {...itemLayout}>
-                      <InputNumber defaultValue={3} min={0} max={100} />%
+                      <InputNumber
+                        defaultValue={fee.lateRate}
+                        min={0}
+                        max={100}
+                        onChange={e => this.handleRateChange(e, index)}
+                      />
+                      %
                     </Form.Item>
                   </Card>
                 </Col>
