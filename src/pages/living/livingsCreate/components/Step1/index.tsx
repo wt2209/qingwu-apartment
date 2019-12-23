@@ -1,8 +1,10 @@
 import React, { Fragment } from 'react';
 import { Form, Select, Input, Button, Radio, DatePicker, Checkbox } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
+import moment from 'moment';
 import styles from '../../style.less';
 import { OptionsType } from '../../model';
+import { BasicInfoType } from '../..';
 
 const itemLayout = {
   labelCol: { span: 5 },
@@ -10,8 +12,9 @@ const itemLayout = {
 };
 
 interface Props extends FormComponentProps {
+  data: BasicInfoType;
   options: OptionsType;
-  onSubmit: (values:Object)=>void
+  onSubmit: (values: BasicInfoType) => void;
 }
 interface State {
   isUnfixedContract: boolean; // 是否是无固定期合同
@@ -32,24 +35,40 @@ class Step1 extends React.Component<Props, State> {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        const { rentPeriod, ...rest } = values;
-        const result = { ...rest };
-        if (rentPeriod) {
-          result.rentStart = rentPeriod[0].format('YYYY-MM-DD');
-          result.rentEnd = rentPeriod[1].format('YYYY-MM-DD');
+        // const { person } = values;
+        // const { rentPeriod, ...rest } = person;
+        const result = values;
+
+        switch (values.type) {
+          case 'person':
+            if (this.state.isUnfixedContract && result.person.contractStart) {
+              // 是无固定期劳动合同
+              result.person.contractStart = result.person.contractStart.format('YYYY-MM-DD');
+              result.person.contractEnd = '无固定期';
+            } else {
+              if (result.person.contractPeriod) {
+                result.person.contractStart = result.person.contractPeriod[0].format('YYYY-MM-DD');
+                result.person.contractEnd = result.person.contractPeriod[1].format('YYYY-MM-DD');
+              }
+              delete result.person.contractPeriod;
+            }
+            break;
+          case 'company':
+            break;
+
+          case 'functional':
+            break;
+
+          default:
+            break;
         }
-        if (this.state.isUnfixedContract && result.contractStart) {
-          // 是无固定期劳动合同
-          result.contractStart = result.contractStart.format('YYYY-MM-DD');
-          result.contractEnd = '无固定期';
-        } else {
-          if (result.contractPeriod) {
-            result.contractStart = result.contractPeriod[0].format('YYYY-MM-DD');
-            result.contractEnd = result.contractPeriod[1].format('YYYY-MM-DD');
-          }
-          delete result.contractPeriod;
+        if (result.rentPeriod) {
+          result.rentStart = result.rentPeriod[0].format('YYYY-MM-DD');
+          result.rentEnd = result.rentPeriod[1].format('YYYY-MM-DD');
         }
-        this.props.onSubmit(result)
+        delete result.rentPeriod;
+
+        this.props.onSubmit(result);
       }
     });
   };
@@ -77,6 +96,7 @@ class Step1 extends React.Component<Props, State> {
   render() {
     const { filteredCategories, type } = this.state;
     const { getFieldDecorator } = this.props.form;
+    const { data } = this.props;
 
     return (
       <Fragment>
@@ -88,7 +108,7 @@ class Step1 extends React.Component<Props, State> {
         >
           <Form.Item {...itemLayout} label="属于">
             {getFieldDecorator('type', {
-              initialValue: type,
+              initialValue: data.type,
               rules: [{ required: true, message: '必须选择' }],
             })(
               <Radio.Group style={{ marginLeft: 16 }} onChange={e => this.handleTypeChange(e)}>
@@ -101,6 +121,7 @@ class Step1 extends React.Component<Props, State> {
 
           <Form.Item {...itemLayout} label="类型">
             {getFieldDecorator('category', {
+              initialValue: data.category,
               rules: [{ required: true, message: '必须选择' }],
             })(
               <Select>
@@ -117,23 +138,26 @@ class Step1 extends React.Component<Props, State> {
           {type === 'person' && (
             <Fragment>
               <Form.Item {...itemLayout} label="身份证号">
-                {getFieldDecorator('identify', {
+                {getFieldDecorator('person.identify', {
+                  initialValue: data.person ? data.person.identify : '',
                   rules: [{ len: 18, message: '身份证号必须是18位' }],
                 })(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="姓名">
-                {getFieldDecorator('name', {
+                {getFieldDecorator('person.name', {
+                  initialValue: data.person ? data.person.name : '',
                   rules: [{ required: true, message: '必须输入' }],
                 })(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="工号">
-                {getFieldDecorator('serial', {
+                {getFieldDecorator('person.serial', {
+                  initialValue: data.person ? data.person.serial : '',
                   rules: [],
                 })(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="性别">
-                {getFieldDecorator('gender', {
-                  initialValue: '男',
+                {getFieldDecorator('person.gender', {
+                  initialValue: data.person ? data.person.gender : '男',
                   rules: [{ required: true, message: '必须输入' }],
                 })(
                   <Radio.Group style={{ marginLeft: 16 }}>
@@ -143,8 +167,8 @@ class Step1 extends React.Component<Props, State> {
                 )}
               </Form.Item>
               <Form.Item {...itemLayout} label="学历">
-                {getFieldDecorator('education', {
-                  initialValue: '其他',
+                {getFieldDecorator('person.education', {
+                  initialValue: data.person ? data.person.education : '其他',
                   rules: [{ required: true, message: '必须输入' }],
                 })(
                   <Radio.Group style={{ marginLeft: 16 }}>
@@ -156,25 +180,35 @@ class Step1 extends React.Component<Props, State> {
                 )}
               </Form.Item>
               <Form.Item {...itemLayout} label="电话">
-                {getFieldDecorator('phone')(<Input />)}
+                {getFieldDecorator('person.phone', {
+                  initialValue: data.person ? data.person.phone : '',
+                })(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="部门">
-                {getFieldDecorator('department')(<Input />)}
+                {getFieldDecorator('person.department', {
+                  initialValue: data.person ? data.person.department : '',
+                })(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="入职时间">
-                {getFieldDecorator('hiredAt')(<Input />)}
+                {getFieldDecorator('person.hiredAt', {
+                  initialValue: data.person ? moment(data.person.hiredAt) : null,
+                })(<DatePicker format="YYYY-MM-DD" />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="入住时间">
-                {getFieldDecorator('enteredAt')(<Input />)}
+                {getFieldDecorator('person.enteredAt', {
+                  initialValue: data.person ? moment(data.person.enteredAt) : null,
+                })(<DatePicker format="YYYY-MM-DD" />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="劳动合同">
                 {this.state.isUnfixedContract
-                  ? getFieldDecorator('contractStart')(
-                      <DatePicker placeholder="开始日期" format="YYYY-MM-DD" />,
-                    )
-                  : getFieldDecorator('contractPeriod')(
-                      <DatePicker.RangePicker format="YYYY-MM-DD" />,
-                    )}
+                  ? getFieldDecorator('person.contractStart', {
+                      initialValue: data.person ? moment(data.person.contractStart) : null,
+                    })(<DatePicker placeholder="开始日期" format="YYYY-MM-DD" />)
+                  : getFieldDecorator('person.contractPeriod', {
+                      initialValue: data.person
+                        ? [moment(data.person.contractStart), moment(data.person.contractEnd)]
+                        : null,
+                    })(<DatePicker.RangePicker format="YYYY-MM-DD" />)}
                 <Checkbox
                   style={{ float: 'right' }}
                   defaultChecked={this.state.isUnfixedContract}
@@ -183,20 +217,18 @@ class Step1 extends React.Component<Props, State> {
                   无固定期
                 </Checkbox>
               </Form.Item>
-              <Form.Item {...itemLayout} label="租期">
-                {getFieldDecorator('rentPeriod')(<DatePicker.RangePicker format="YYYY-MM-DD" />)}
-              </Form.Item>
+
               <Form.Item {...itemLayout} label="籍贯">
-                {getFieldDecorator('origin')(<Input />)}
+                {getFieldDecorator('person.origin')(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="紧急联系人">
-                {getFieldDecorator('emergencyPerson')(<Input />)}
+                {getFieldDecorator('person.emergencyPerson')(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="联系人电话">
-                {getFieldDecorator('emergencyPhone')(<Input />)}
+                {getFieldDecorator('person.emergencyPhone')(<Input />)}
               </Form.Item>
-              <Form.Item {...itemLayout} label="备注">
-                {getFieldDecorator('remark')(<Input.TextArea />)}
+              <Form.Item {...itemLayout} label="人员说明">
+                {getFieldDecorator('person.remark')(<Input />)}
               </Form.Item>
             </Fragment>
           )}
@@ -205,51 +237,49 @@ class Step1 extends React.Component<Props, State> {
           {type === 'company' && (
             <Fragment>
               <Form.Item {...itemLayout} label="公司名">
-                {getFieldDecorator('companyName', {
+                {getFieldDecorator('company.companyName', {
                   rules: [{ required: true, message: '必须输入' }],
                 })(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="负责人">
-                {getFieldDecorator('manager', {
+                {getFieldDecorator('company.manager', {
                   rules: [{ required: true, message: '必须输入' }],
                 })(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="负责人电话">
-                {getFieldDecorator('managerPhone', {
+                {getFieldDecorator('company.managerPhone', {
                   rules: [],
                 })(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="日常联系人">
-                {getFieldDecorator('linkman', {
+                {getFieldDecorator('company.linkman', {
                   rules: [],
                 })(<Input />)}
               </Form.Item>
               <Form.Item {...itemLayout} label="联系人电话">
-                {getFieldDecorator('linkmanPhone', {
+                {getFieldDecorator('company.linkmanPhone', {
                   rules: [],
                 })(<Input />)}
               </Form.Item>
 
               <Form.Item {...itemLayout} label="房间入住日">
-                {getFieldDecorator('enteredAt')(<DatePicker format="YYYY-MM-DD" />)}
+                {getFieldDecorator('company.enteredAt')(<DatePicker format="YYYY-MM-DD" />)}
               </Form.Item>
-
-              <Form.Item {...itemLayout} label="备注">
-                {getFieldDecorator('remark')(<Input.TextArea />)}
+              <Form.Item {...itemLayout} label="公司说明">
+                {getFieldDecorator('company.remark')(<Input />)}
               </Form.Item>
             </Fragment>
           )}
+          <Form.Item {...itemLayout} label="租期">
+            {getFieldDecorator('rentPeriod', {
+              initialValue: data.rentStart ? [moment(data.rentStart), moment(data.rentEnd)] : null,
+            })(<DatePicker.RangePicker format="YYYY-MM-DD" />)}
+          </Form.Item>
+          <Form.Item {...itemLayout} label="备注">
+            {getFieldDecorator('remark')(<Input.TextArea />)}
+          </Form.Item>
 
-          <Form.Item
-            wrapperCol={{
-              xs: { span: 24, offset: 0 },
-              sm: {
-                span: 5,
-                offset: 5,
-              },
-            }}
-            label=""
-          >
+          <Form.Item style={{ textAlign: 'right' }}>
             <Button type="primary" htmlType="submit">
               下一步
             </Button>

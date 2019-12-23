@@ -1,7 +1,7 @@
-import { CategoryListItem } from '../categories/data';
-import { RoomListItem } from '../rooms/data';
-import { CompanyListItem } from '../companies/data';
-import { PersonListItem } from '../people/data';
+import { CategoryListItem } from '../categories/data.d';
+import { RoomListItem } from '../rooms/data.d';
+import { CompanyListItem } from '../companies/data.d';
+import { PersonListItem } from '../people/data.d';
 
 export interface RecordListItem {
   id: number;

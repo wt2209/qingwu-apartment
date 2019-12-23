@@ -10,8 +10,19 @@ import { CompanyListItem } from '../companies/data.d';
 import Step1 from './components/Step1';
 import Step2 from './components/Step2';
 import { ChargeRule } from '@/models/common';
+import Step3 from './components/Step3';
 
 const { Step } = Steps;
+
+export interface BasicInfoType {
+  type: 'person' | 'company' | 'functional';
+  category: number | undefined;
+  rentStart?: string;
+  rentEnd?: string;
+  person?: PersonListItem;
+  company?: CompanyListItem;
+  remark: string;
+}
 
 interface Props extends FormComponentProps {
   options: OptionsType; // 基本信息中的可选项目，如所有公司、所有类型
@@ -21,13 +32,8 @@ interface Props extends FormComponentProps {
 
 interface State {
   currentStep: number;
-  basicInfo: Object;
+  basicInfo: BasicInfoType;
   chargeRules: ChargeRule[];
-  type: 'person' | 'company' | 'functional' | null;
-  person: PersonListItem | null;
-  company: CompanyListItem | null;
-  filteredCompanies: Array<{ id: number; companyName: string }>;
-  filteredCategories: Array<{ id: number; title: string; type: string }>;
 }
 
 @connect(
@@ -48,8 +54,14 @@ interface State {
 )
 class LivingCreate extends React.Component<Props, State> {
   state: State = {
-    currentStep: 1,
-    basicInfo: {},
+    currentStep: 2,
+    basicInfo: {
+      type: 'person',
+      category: undefined,
+      rentStart: '2013-12-12',
+      rentEnd: '2019-8-12',
+      remark: '',
+    },
     chargeRules: [
       {
         title: '租赁房租',
@@ -57,41 +69,39 @@ class LivingCreate extends React.Component<Props, State> {
         lateRate: 3,
       },
     ],
-    type: null, // 当前选择的类型
-    person: null, // 人员基本信息，与company二选一
-    company: null, // 公司基本信息，与person二选一
-    filteredCompanies: [], // 可选的公司
-    filteredCategories: [], // 可选的类型
   };
 
   componentDidMount = () => {
     this.props.dispatch({ type: 'livingsCreate/getOptions' });
   };
 
-  handleBasicInfoSubmit = (values: Object) => {
+  handleBasicInfoSubmit = (values: BasicInfoType) => {
     this.setState({ basicInfo: values, currentStep: 1 });
   };
 
   handleChargeRulesSubmit = (values: ChargeRule[]) => {
-    this.setState({ chargeRules: values, currentStep: 2 });
+    this.setState({ chargeRules: values }, () => {
+      console.log(this.state);
+    });
   };
 
   prevStep = () => {
-    this.setState({ currentStep: this.state.currentStep - 1 });
+    const { currentStep } = this.state;
+    this.setState({ currentStep: currentStep - 1 });
   };
 
   render() {
-    const { currentStep } = this.state;
+    const { currentStep, basicInfo, chargeRules } = this.state;
 
     const mapper = [
-      <Step1 onSubmit={this.handleBasicInfoSubmit} options={this.props.options} />,
+      <Step1 data={basicInfo} onSubmit={this.handleBasicInfoSubmit} options={this.props.options} />,
       <Step2
         onSubmit={this.handleChargeRulesSubmit}
         options={this.props.options}
-        data={this.state.chargeRules}
+        data={chargeRules}
         prevStep={this.prevStep}
       />,
-      <Step1 onSubmit={this.handleBasicInfoSubmit} options={this.props.options} />,
+      <Step3 />,
     ];
 
     return (

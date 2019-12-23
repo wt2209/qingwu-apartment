@@ -45,20 +45,21 @@ class Step2 extends React.Component<Props, State> {
     let { data } = this.state;
     // 去除费用中的空值
     data = data.map(d => {
-      d.costs = d.costs.filter(c => c);
-      return d;
+      const result = d;
+      result.costs = d.costs.filter(c => c);
+      return result;
     });
     // 去除没有费用的项目
     data = data.filter(d => d.costs.length > 0);
 
-    this.props.onSubmit(data)
+    this.props.onSubmit(data);
   };
 
   handleAddNewFee = () => {
-    const { newTitle } = this.state;
+    const { newTitle, data } = this.state;
     this.setState({
       data: [
-        ...this.state.data,
+        ...data,
         {
           title: newTitle,
           costs: [],
@@ -76,15 +77,17 @@ class Step2 extends React.Component<Props, State> {
 
   handleCostsChange = (e: any, index: number) => {
     const values = e.target.value.split('\n');
-    const data = [...this.state.data];
-    let errors = this.state.errors;
+    const { data } = this.state;
+    const { errors } = this.state;
     errors[index] = values.some((v: string) => !isNumber(v)) ? 'error' : 'success';
     data[index].costs = values;
     this.setState({ data, errors });
   };
 
-  handleRateChange = (e: any, index: number) => {
-    console.log(e);
+  handleRateChange = (value: number | undefined, index: number) => {
+    const { data } = this.state;
+    data[index].lateRate = value || 0;
+    this.setState({ data });
   };
 
   handleModalVisible = (flag: boolean) => {
@@ -92,28 +95,19 @@ class Step2 extends React.Component<Props, State> {
   };
 
   handleDelete = (index: number) => {
-    const data = this.state.data.filter((d, i) => i !== index);
-    this.setState({ data });
+    const { data } = this.state;
+    const newData = data.filter((d, i) => i !== index);
+    this.setState({ data: newData });
   };
 
-  renderCostsShow = (values: number[]) => {
-    let str = '';
-    for (let i = 0; i < values.length; i++) {
-      str += values[i] + '\n';
-    }
-    return str;
-  };
-
-  renderTitle = (title: string, index: number) => {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span>{title}</span>
-        <Button type="link" onClick={() => this.handleDelete(index)} style={{ height: 24 }}>
-          删除
-        </Button>
-      </div>
-    );
-  };
+  renderTitle = (title: string, index: number) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <span>{title}</span>
+      <Button type="link" onClick={() => this.handleDelete(index)} style={{ height: 24 }}>
+        删除
+      </Button>
+    </div>
+  );
 
   render() {
     const { data, newTitle, errors } = this.state;
@@ -140,9 +134,9 @@ class Step2 extends React.Component<Props, State> {
           {data.length > 0 ? (
             <Row gutter={16}>
               {data.map((fee, index) => (
-                <Col key={index} span={12}>
+                <Col key={`col${fee.title}`} span={12}>
                   <Card
-                    key={index}
+                    key={`card${fee.title}`}
                     title={this.renderTitle(fee.title, index)}
                     size="small"
                     style={{ marginBottom: 16 }}
@@ -164,7 +158,9 @@ class Step2 extends React.Component<Props, State> {
                         defaultValue={fee.lateRate}
                         min={0}
                         max={100}
-                        onChange={e => this.handleRateChange(e, index)}
+                        onChange={(value: number | undefined) =>
+                          this.handleRateChange(value, index)
+                        }
                       />
                       %
                     </Form.Item>
@@ -198,7 +194,7 @@ class Step2 extends React.Component<Props, State> {
         >
           <Form.Item label="费用名称">
             <Select
-              showSearch={true}
+              showSearch
               style={{ width: '100%' }}
               value={newTitle}
               onChange={this.handleTitleChange}
