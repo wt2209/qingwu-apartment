@@ -13,9 +13,7 @@ import Functional from './components/Functional';
 import { LivingListItem, BuildingTreeItem } from './data';
 import { RecordListItem } from '../records/data';
 import { Link } from 'umi';
-import SearchBar from './components/SearchBar';
-
-const { TreeNode, DirectoryTree } = Tree;
+import SelectAndSearch from './components/SelectAndSearch';
 
 const buildingTree: BuildingTreeItem[] = [
   { building: '1#', units: ['1单元', '2单元'] },
@@ -24,7 +22,7 @@ const buildingTree: BuildingTreeItem[] = [
   { building: '4#', units: ['1单元', '2单元', '3单元'] },
   { building: '5#', units: ['1单元', '2单元', '3单元', '4单元'] },
   { building: '6#', units: ['1单元', '2单元', '3单元', '4单元'] },
-  { building: '7#', units: ['1单元', '2单元', '3单元', '4单元'] },
+  { building: '7#', units: ['1单元', '2单元', '3单元', '4单元', '5单元'] },
   { building: '8#', units: ['1单元', '2单元', '3单元', '4单元'] },
   { building: '9#', units: ['1单元', '2单元', '3单元', '4单元'] },
   { building: '10#', units: ['1单元', '2单元', '3单元', '4单元'] },
@@ -69,39 +67,10 @@ export interface State {
   }),
 )
 class Living extends React.Component<Props, State> {
-  state: State = {
-    checkedKeys: [],
-    expandedKeys: [],
-  };
-
   fetchData = (options: LivingFetchParams) => {
     const payload = removeEmpty(options);
     console.log(payload);
     this.props.dispatch({ type: 'livings/fetch', payload });
-  };
-
-  componentDidMount = () => {
-    const { params } = this.props.livings;
-    if (params.selectedBuilding && params.selectedUnit) {
-      this.setState({
-        expandedKeys: [params.selectedBuilding],
-        checkedKeys: [params.selectedBuilding + '|' + params.selectedUnit]
-      })
-    }
-  }
-
-  onSelect = (keys: string[]) => {
-    if (keys[0].indexOf('|') === -1) { // 点击的是楼号
-      if (keys[0] === this.state.expandedKeys[0]) { // 折叠
-        this.setState({ expandedKeys: [] })
-      } else {
-        this.setState({ expandedKeys: keys }) // 展开
-      }
-    } else { // 点击的是单元号
-      const [selectedBuilding, selectedUnit] = keys[0].split('|');
-      this.setState({ checkedKeys: keys });
-      this.fetchData({ selectedBuilding, selectedUnit });
-    }
   };
 
   renderContent = (living: LivingListItem) => {
@@ -190,7 +159,6 @@ class Living extends React.Component<Props, State> {
 
   render() {
     const { livings, loading } = this.props;
-    const { expandedKeys, checkedKeys } = this.state;
     const {
       data: { list },
       params,
@@ -201,26 +169,12 @@ class Living extends React.Component<Props, State> {
         <div>
           <Spin spinning={loading || false}>
             <Card style={{ marginBottom: 20 }}>
-              <SearchBar fetchData={this.fetchData} params={params} />
+              <SelectAndSearch buildingTree={buildingTree} params={params} fetchData={this.fetchData} />
             </Card>
           </Spin>
         </div>
         <div style={{ display: 'flex' }}>
-          <div style={{ width: 148, marginRight: 16 }} >
-            <Card bodyStyle={{ padding: 6}}>
-              <Spin spinning={loading || false}>
-                <DirectoryTree expandedKeys={expandedKeys} checkedKeys={checkedKeys} onSelect={this.onSelect}>
-                  {buildingTree.map(item =>
-                    <TreeNode title={item.building} key={item.building}>
-                      {item.units.map(unit => <TreeNode title={unit} key={item.building + "|" + unit} isLeaf />)}
-                    </TreeNode>
-                  )}
-                </DirectoryTree >
-              </Spin>
-            </Card>
-          </div>
           <div style={{ flex: 1 }}>
-            
             <Row gutter={24}>
               {list.map(living => (
                 <Col md={12} sm={24} key={living.id}>
